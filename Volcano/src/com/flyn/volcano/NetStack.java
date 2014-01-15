@@ -1,39 +1,54 @@
 package com.flyn.volcano;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.client.CookieStore;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
+import android.content.Context;
+
 import com.flyn.volcano.Request.Method;
 
 public abstract class NetStack
 {
-    protected static final int    DEFAULT_MAX_CONNETIONS          = 10;
-    protected static final int    DEFAULT_SOCKET_TIMEOUT          = 10 * 1000;
-    protected static final int    DEFAULT_MAX_RETRIES             = 3;
-    protected static final int    DEFAULT_RETRY_SLEEP_TIME_MILLIS = 1500;
-    protected static final int    DEFAULT_SOCKET_BUFFER_SIZE      = 8192;
-    protected static final String HEADER_ACCEPT_ENCODING          = "Accept-Encoding";
-    protected static final String HEADER_CONTENT_TYPE             = "Content-Type";
-    protected static final String ENCODING_GZIP                   = "gzip";
-    protected static int          httpPort                        = 80;
-    protected static int          httpsPort                       = 443;
+    protected static final int                  DEFAULT_MAX_CONNETIONS          = 10;
+    protected static final int                  DEFAULT_SOCKET_TIMEOUT          = 10 * 1000;
+    protected static final int                  DEFAULT_MAX_RETRIES             = 3;
+    protected static final int                  DEFAULT_RETRY_SLEEP_TIME_MILLIS = 1500;
+    protected static final int                  DEFAULT_SOCKET_BUFFER_SIZE      = 8192;
+    protected static final String               HEADER_ACCEPT_ENCODING          = "Accept-Encoding";
+    protected static final String               HEADER_CONTENT_TYPE             = "Content-Type";
+    protected static final String               ENCODING_GZIP                   = "gzip";
+    protected static int                        httpPort                        = 80;
+    protected static int                        httpsPort                       = 443;
 
-    protected final boolean       fixNoHttpResponseException      = false;
-    protected int                 maxConnections                  = DEFAULT_MAX_CONNETIONS;
-    protected int                 timeout                         = DEFAULT_SOCKET_TIMEOUT;
-    protected Map<String, String> httpHeaderMap;
-    protected boolean             isURLEncodingEnabled            = true;
+    protected final Context                     context;
+    protected final boolean                     fixNoHttpResponseException      = false;
+    protected ExecutorService                   threadPool;
+    protected int                               maxConnections                  = DEFAULT_MAX_CONNETIONS;
+    protected int                               timeout                         = DEFAULT_SOCKET_TIMEOUT;
+    protected Map<Context, List<RequestFuture>> requestMap;
+    protected Map<String, String>               httpHeaderMap;
+    protected boolean                           isURLEncodingEnabled            = true;
 
-    public NetStack()
+    protected NetStack(Context context)
     {
+        this.threadPool = Executors.newCachedThreadPool();
+        this.requestMap = new WeakHashMap<Context, List<RequestFuture>>();
         this.httpHeaderMap = new HashMap<String, String>();
+        this.context = context;
     }
 
-    protected abstract void sendRequest(String contentType, IResponseHandler responseHandler);
+    protected abstract RequestFuture sendRequest(String contentType, IResponseHandler responseHandler);
+
+    protected abstract void addHeaders(Map<String, String> headers);
 
     protected abstract void get(String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler);
 
@@ -45,7 +60,7 @@ public abstract class NetStack
 
     protected abstract void head(String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler);
 
-    public void makeRequest(int method, String contentType, String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
+    public RequestFuture makeRequest(int method, String contentType, String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
     {
 
         switch (method)
@@ -69,10 +84,8 @@ public abstract class NetStack
                 throw new IllegalStateException("Unknown request method.");
         }
         addHeaders(headers);
-        sendRequest(contentType, responseHandler);
+        return sendRequest(contentType, responseHandler);
     }
-    
-    protected abstract void addHeaders( Map<String, String> headers);
 
     public int getMaxConnections()
     {
@@ -93,6 +106,30 @@ public abstract class NetStack
     public void setURLEncodingEnabled(boolean isURLEncodingEnabled)
     {
         this.isURLEncodingEnabled = isURLEncodingEnabled;
+    }
+
+    public void cancelRequests(Context context, boolean mayInterruptIfRunning)
+    {
+
+        List<RequestFuture> requestList = this.requestMap.get(context);
+        if (requestList != null)
+        {
+            for (RequestFuture requestHandle : requestList)
+            {
+                requestHandle.cancel(mayInterruptIfRunning);
+            }
+            this.requestMap.remove(context);
+        }
+    }
+
+    /**
+     * Set it before request started
+     * 
+     * @param threadPool
+     */
+    public void setThreadPool(ThreadPoolExecutor threadPool)
+    {
+        this.threadPool = threadPool;
     }
 
     public int timeOut()

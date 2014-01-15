@@ -254,8 +254,8 @@ public abstract class HttpResponseHandler implements IResponseHandler
             if (null != msg)
             {
                 msg.what = responseMessageId;
-                if(null!=responseMessage)
-                msg.obj = responseMessage;
+                if (null != responseMessage)
+                    msg.obj = responseMessage;
             }
         }
         return msg;

@@ -15,7 +15,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.protocol.HTTP;
 
 /**
- * The container for  request parameters   
+ * The container for request parameters
  * 
  * @author V
  * 

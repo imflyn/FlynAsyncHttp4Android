@@ -3,8 +3,12 @@ package com.flyn.volcano;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -48,6 +52,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.SyncBasicHttpContext;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -60,9 +65,9 @@ public class HttpClientStack extends NetStack
     private final HttpContext       httpContext;
     private HttpUriRequest          httpUriRequest;
 
-    public HttpClientStack()
+    protected HttpClientStack(Context context)
     {
-        super();
+        super(context);
         BasicHttpParams httpParams = new BasicHttpParams();
         ConnManagerParams.setTimeout(httpParams, this.timeout);
         ConnManagerParams.setMaxConnectionsPerRoute(httpParams, new ConnPerRouteBean(this.maxConnections));
@@ -126,7 +131,6 @@ public class HttpClientStack extends NetStack
             }
         });
         this.httpClient.setHttpRequestRetryHandler(new RetryHandler(DEFAULT_MAX_RETRIES, DEFAULT_RETRY_SLEEP_TIME_MILLIS));
-
     }
 
     private SchemeRegistry getDefaultSchemeRegistry()
@@ -164,7 +168,6 @@ public class HttpClientStack extends NetStack
     protected void get(String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
     {
         this.httpUriRequest = new HttpGet(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
-        addHeaders(headers);
     }
 
     protected void post(String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
@@ -199,8 +202,19 @@ public class HttpClientStack extends NetStack
         this.httpUriRequest = new HttpHead(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
     }
 
+    protected void addHeaders(Map<String, String> headers)
+    {
+        if (headers != null && null != this.httpUriRequest)
+        {
+            for (Entry<String, String> entry : headers.entrySet())
+            {
+                this.httpUriRequest.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
     @Override
-    protected void sendRequest(String contentType, IResponseHandler responseHandler)
+    protected RequestFuture sendRequest(String contentType, IResponseHandler responseHandler)
     {
 
         if (!TextUtils.isEmpty(contentType))
@@ -220,17 +234,31 @@ public class HttpClientStack extends NetStack
         });
         responseHandler.setRequestURI(this.httpUriRequest.getURI());
 
-    }
+        Request request = new HttpClientRequest(this.httpClient, this.httpContext, this.httpUriRequest, responseHandler);
 
-    protected void addHeaders(Map<String, String> headers)
-    {
-        if (headers != null)
+        this.threadPool.submit(request);
+        RequestFuture requestHandle = new RequestFuture(request);
+
+        if (null != this.context)
         {
-            for (Entry<String, String> entry : headers.entrySet())
+            List<RequestFuture> list = this.requestMap.get(this.context);
+            if (null == list)
             {
-                this.httpUriRequest.setHeader(entry.getKey(), entry.getValue());
+                list = new LinkedList<RequestFuture>();
+                this.requestMap.put(this.context, list);
             }
+            list.add(requestHandle);
+
+            Iterator<RequestFuture> iterator = list.iterator();
+            while (iterator.hasNext())
+            {
+                if (iterator.next().shouldBeGarbageCollected())
+                    iterator.remove();
+            }
+
         }
+
+        return requestHandle;
     }
 
     public HttpClient getHttpClient()
@@ -243,14 +271,19 @@ public class HttpClientStack extends NetStack
         return this.httpContext;
     }
 
-    public final HttpUriRequest getHttpUriRequest()
-    {
-        return this.httpUriRequest;
-    }
-
     public void setCookieStore(CookieStore cookieStore)
     {
         this.httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+    }
+
+    /**
+     * Set it befor request started
+     * 
+     * @param threadPool
+     */
+    public void setThreadPool(ThreadPoolExecutor threadPool)
+    {
+        this.threadPool = threadPool;
     }
 
     public void setEnableRedirects(final boolean enableRedirects)

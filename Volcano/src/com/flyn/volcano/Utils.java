@@ -35,7 +35,7 @@ public class Utils
 
         return HTTP.DEFAULT_CONTENT_CHARSET;
     }
-    
+
     /**
      * Parse date in RFC1123 format, and return its value as epoch
      */

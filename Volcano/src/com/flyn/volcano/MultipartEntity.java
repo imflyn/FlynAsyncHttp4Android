@@ -25,6 +25,7 @@ import android.util.Log;
 
 /**
  * 简洁版apache-mine中的MultipartEntity,省去添加额外jar包的空间
+ * 
  * @author V
  * 
  */
@@ -138,7 +139,7 @@ class MultipartEntity implements HttpEntity
 
         this.out.write(CR_LF);
         this.out.flush();
-        
+
         Utils.quickClose(inputStream);
     }
 
@@ -253,7 +254,7 @@ class MultipartEntity implements HttpEntity
             out.write(CR_LF);
             updateProgress(CR_LF.length);
             out.flush();
-            
+
             Utils.quickClose(inputStream);
         }
     }

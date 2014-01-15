@@ -1,102 +1,92 @@
 package com.flyn.volcano;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class Request implements Comparable<Request>
+import android.util.Log;
+
+public abstract class Request implements Runnable
 {
-    private int                 method;
-    private String              url;
-    private Map<String, String> headers;
-    private RequestParams       params;
-    private String              contentType;
-    private int                 priority;
-    private Object              tag;
 
-    public final Object getTag()
-    {
-        return tag;
-    }
+    protected IResponseHandler responseHandler;
 
-    public final void setTag(Object tag)
-    {
-        this.tag = tag;
-    }
+    protected int              executionCount;
+    protected boolean          isCancelled      = false;
+    protected boolean          cancelIsNotified = false;
+    protected boolean          isFinished       = false;
 
-    public final int getMethod()
+    protected Request(IResponseHandler responseHandler)
     {
-        return method;
-    }
-
-    public final void setMethod(int method)
-    {
-        this.method = method;
-    }
-
-    public final String getUrl()
-    {
-        return url;
-    }
-
-    public final void setUrl(String url)
-    {
-        this.url = url;
-    }
-
-    public final Map<String, String> getHeaders()
-    {
-        return headers;
-    }
-
-    public final void setHeaders(Map<String, String> headers)
-    {
-        this.headers = headers;
-    }
-
-    public final RequestParams getParams()
-    {
-        return params;
-    }
-
-    public final void setParams(RequestParams params)
-    {
-        this.params = params;
-    }
-
-    public final String getContentType()
-    {
-        return contentType;
-    }
-
-    public final void setContentType(String contentType)
-    {
-        this.contentType = contentType;
-    }
-
-    public final int getPriority()
-    {
-        return priority;
-    }
-
-    public final void setPriority(int priority)
-    {
-        this.priority = priority;
+        this.responseHandler = responseHandler;
     }
 
     @Override
-    public int compareTo(Request another)
+    public void run()
     {
-        int left = getPriority();
-        int right = another.getPriority();
-        return left == right ? -1 : this.getPriority() - another.getPriority();
+        if (isCancelled())
+            return;
+
+        if (null != this.responseHandler)
+            this.responseHandler.sendStartMessage();
+
+        if (isCancelled())
+        {
+            return;
+        }
+
+        try
+        {
+            makeRequestWithRetries();
+        } catch (IOException e)
+        {
+            if (!isCancelled() && this.responseHandler != null)
+            {
+                this.responseHandler.sendFailureMessage(0, null, null, e);
+            } else
+            {
+                Log.e(this.getClass().getName(), "makeRequestWithRetries returned error, but handler is null", e);
+            }
+        }
+        if (isCancelled())
+        {
+            return;
+        }
+
+        if (this.responseHandler != null)
+        {
+            this.responseHandler.sendFinishMessage();
+        }
+
+        this.isFinished = true;
     }
 
-    public interface Priority
+    protected abstract void makeRequest() throws IOException;
+
+    protected abstract void makeRequestWithRetries() throws IOException;
+
+    public final boolean isCancelled()
     {
-        int LOW       = 0;
-        int NORMAL    = 1;
-        int HIGH      = 2;
-        int IMMEDIATE = 3;
+        if (this.isCancelled)
+            sendCancleNotification();
+
+        return this.isCancelled;
     }
+
+    private synchronized void sendCancleNotification()
+    {
+        if (!this.isFinished && this.isCancelled && !this.cancelIsNotified)
+        {
+            this.cancelIsNotified = true;
+            if (null != this.responseHandler)
+                this.responseHandler.sendCancleMessage();
+        }
+    }
+
+    public final boolean isFinished()
+    {
+        return isCancelled() || this.isFinished;
+    }
+
+    public abstract boolean cancel(boolean mayInterruptIfRunning);
 
     public interface Method
     {
