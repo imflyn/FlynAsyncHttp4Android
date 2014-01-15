@@ -114,10 +114,8 @@ public abstract class BitmapResponseHandler extends HttpResponseHandler
         }
 
     }
-
     /**
      * Get a resized dimension of bitmap
-     * 
      * @param maxPrimary
      * @param maxSecondary
      * @param actualPrimary

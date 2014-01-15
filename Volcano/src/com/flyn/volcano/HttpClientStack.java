@@ -63,9 +63,8 @@ public class HttpClientStack extends NetStack
 
     private final DefaultHttpClient httpClient;
     private final HttpContext       httpContext;
-    private HttpUriRequest          httpUriRequest;
 
-    protected HttpClientStack(Context context)
+    public HttpClientStack(Context context)
     {
         super(context);
         BasicHttpParams httpParams = new BasicHttpParams();
@@ -165,76 +164,95 @@ public class HttpClientStack extends NetStack
         return schemeRegistry;
     }
 
-    protected void get(String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
+    protected RequestFuture get( String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
     {
-        this.httpUriRequest = new HttpGet(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+        HttpGet request = new HttpGet(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+        addHeaders(request, headers);
+        return sendRequest( null, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
+
     }
 
-    protected void post(String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
+    protected RequestFuture post( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
     {
-        this.httpUriRequest = new HttpPost(url);
+        HttpPost request = new HttpPost(url);
         if (null != params)
         {
             HttpEntity entity = paramsToEntity(params, responseHandler);
             if (null != entity)
-                ((HttpResponse) this.httpUriRequest).setEntity(entity);
+                request.setEntity(entity);
         }
+        addHeaders(request, headers);
+        return sendRequest( contentType, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
     }
 
-    protected void delete(String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
+    protected RequestFuture delete(String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
     {
-        this.httpUriRequest = new HttpDelete(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+        HttpDelete request = new HttpDelete(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+        addHeaders(request, headers);
+        return sendRequest( null, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
     }
 
-    protected void put(String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
+    protected RequestFuture put( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
     {
-        this.httpUriRequest = new HttpPut(url);
+        HttpPut request = new HttpPut(url);
         if (null != params)
         {
             HttpEntity entity = paramsToEntity(params, responseHandler);
             if (null != entity)
-                ((HttpResponse) this.httpUriRequest).setEntity(entity);
+                request.setEntity(entity);
         }
+        addHeaders(request, headers);
+        return sendRequest(contentType, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
     }
 
-    protected void head(String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
+    protected RequestFuture head( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
     {
-        this.httpUriRequest = new HttpHead(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+        HttpUriRequest request = new HttpHead(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+        addHeaders(request, headers);
+        return sendRequest( contentType, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
     }
 
-    protected void addHeaders(Map<String, String> headers)
+    private Object[] prepareArgument(DefaultHttpClient client, HttpContext httpContext, HttpUriRequest uriRequest)
     {
-        if (headers != null && null != this.httpUriRequest)
+        return new Object[] { client, httpContext, uriRequest };
+    }
+
+    private void addHeaders(HttpUriRequest request, Map<String, String> headers)
+    {
+        if (headers != null)
         {
             for (Entry<String, String> entry : headers.entrySet())
             {
-                this.httpUriRequest.setHeader(entry.getKey(), entry.getValue());
+                request.setHeader(entry.getKey(), entry.getValue());
             }
         }
     }
 
     @Override
-    protected RequestFuture sendRequest(String contentType, IResponseHandler responseHandler)
+    protected RequestFuture sendRequest( String contentType, IResponseHandler responseHandler, Object[] objs)
     {
+        final DefaultHttpClient client = (DefaultHttpClient) objs[0];
+        final HttpContext httpContext = (HttpContext) objs[1];
+        final HttpUriRequest uriRequest = (HttpUriRequest) objs[2];
 
         if (!TextUtils.isEmpty(contentType))
         {
-            this.httpUriRequest.setHeader(HEADER_CONTENT_TYPE, contentType);
+            uriRequest.setHeader(HEADER_CONTENT_TYPE, contentType);
         }
 
         responseHandler.setRequestHeaders(new HashMap<String, String>()
         {
             private static final long serialVersionUID = 1L;
             {
-                for (Header header : httpUriRequest.getAllHeaders())
+                for (Header header : uriRequest.getAllHeaders())
                 {
                     put(header.getName(), header.getValue());
                 }
             }
         });
-        responseHandler.setRequestURI(this.httpUriRequest.getURI());
+        responseHandler.setRequestURI(uriRequest.getURI());
 
-        Request request = new HttpClientRequest(this.httpClient, this.httpContext, this.httpUriRequest, responseHandler);
+        Request request = new HttpClientRequest(client, httpContext, uriRequest, responseHandler);
 
         this.threadPool.submit(request);
         RequestFuture requestHandle = new RequestFuture(request);
@@ -278,7 +296,6 @@ public class HttpClientStack extends NetStack
 
     /**
      * Set it befor request started
-     * 
      * @param threadPool
      */
     public void setThreadPool(ThreadPoolExecutor threadPool)

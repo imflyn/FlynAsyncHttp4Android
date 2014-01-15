@@ -11,8 +11,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
- * The container for HttpClient request parameters
- * 
+ * The container for HttpClient request parameters   
  * @author V
  * 
  */
