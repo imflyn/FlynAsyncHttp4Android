@@ -24,7 +24,7 @@ import org.apache.http.protocol.HTTP;
  * @author V
  * 
  */
-public  class RequestParams
+public class RequestParams
 {
     protected ConcurrentHashMap<String, String>        urlParams;
     protected ConcurrentHashMap<String, FileWrapper>   fileParams;
@@ -140,7 +140,6 @@ public  class RequestParams
             return createMultipartEntity(progressHandler);
         }
     }
-    
 
     protected HttpEntity createNormalEitity()
     {
@@ -150,7 +149,6 @@ public  class RequestParams
         {
             lparams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
-
         try
         {
             return new UrlEncodedFormEntity(lparams, this.contentEncoding);
@@ -163,13 +161,13 @@ public  class RequestParams
     protected HttpEntity createMultipartEntity(IResponseHandler progressHandler) throws IOException
     {
         MultipartEntity entity = new MultipartEntity(progressHandler);
+                
         entity.setIsRepeatable(this.isRepeatable);
-
+        
         for (ConcurrentHashMap.Entry<String, String> entry : this.urlParams.entrySet())
         {
             entity.addPart(entry.getKey(), entry.getValue());
         }
-
         for (ConcurrentHashMap.Entry<String, StreamWrapper> entry : this.streamParams.entrySet())
         {
             StreamWrapper stream = entry.getValue();
@@ -178,7 +176,6 @@ public  class RequestParams
                 entity.addPart(entry.getKey(), stream.name, stream.inputStream, stream.contentType);
             }
         }
-
         for (ConcurrentHashMap.Entry<String, FileWrapper> entry : this.fileParams.entrySet())
         {
             FileWrapper fileWrapper = entry.getValue();
@@ -221,7 +218,7 @@ public  class RequestParams
             throw new IllegalArgumentException(problem);
         }
     }
-    
+
     protected final ConcurrentHashMap<String, String> getUrlParams()
     {
         return this.urlParams;
@@ -236,8 +233,6 @@ public  class RequestParams
     {
         return this.streamParams;
     }
-
-
 
     public static class FileWrapper
     {

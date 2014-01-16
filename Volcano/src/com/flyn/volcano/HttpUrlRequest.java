@@ -1,21 +1,35 @@
 package com.flyn.volcano;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.UnknownHostException;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 
 import android.util.Log;
 
 public class HttpUrlRequest extends Request
 {
-    private final HttpURLConnection connect;
+    private final HttpURLConnection connection;
     private final RequestParams     requestParams;
-    
-    
-    public HttpUrlRequest(HttpURLConnection connect, RequestParams requestParams, IResponseHandler responseHandler)
+
+    public HttpUrlRequest(HttpURLConnection connection, RequestParams requestParams, IResponseHandler responseHandler)
     {
         super(responseHandler);
-        this.connect = connect;
+        this.connection = connection;
         this.requestParams = requestParams;
     }
 
@@ -24,62 +38,64 @@ public class HttpUrlRequest extends Request
     {
         if (isCancelled())
             return;
-        
-        this.requestParams.getFileParams();
-        
-        
-        // if (this.request.getURI().getScheme() == null)
-        // throw new MalformedURLException("No valid URI scheme was provided.");
-        //
-        // HttpResponse response = this.client.execute(this.request,
-        // this.context);
 
-        // if (!isCancelled() && this.responseHandler != null)
-        // this.responseHandler.sendResponseMessage(response);
+        if (null != this.requestParams)
+        {
+            HttpEntity httpEntity = this.requestParams.getEntity(this.responseHandler);
+            OutputStream outStream = this.connection.getOutputStream();
+            httpEntity.writeTo(outStream);
+        }
+
+        ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 1);
+        int responseCode = this.connection.getResponseCode();
+        if (responseCode == -1)
+        {
+            throw new IOException("Could not retrieve response code from HttpUrlConnection.");
+        }
+        StatusLine responseStatus = new BasicStatusLine(protocolVersion, this.connection.getResponseCode(), this.connection.getResponseMessage());
+        BasicHttpResponse response = new BasicHttpResponse(responseStatus);
+        response.setEntity(entityFromConnection(this.connection));
+
+        Map<String, String> headersMap = new HashMap<String, String>();
+        for (Entry<String, List<String>> header : this.connection.getHeaderFields().entrySet())
+        {
+            if (header.getKey() != null)
+            {
+                String key = header.getKey();
+                String value = header.getValue().get(0);
+                headersMap.put(key, value);
+                Header h = new BasicHeader(key, value);
+                response.addHeader(h);
+            }
+        }
+     
+        if (!isCancelled() && null != this.responseHandler)
+        {
+            this.responseHandler.setRequestHeaders(headersMap);
+            try
+            {
+                this.responseHandler.setRequestURI(connection.getURL().toURI());
+            } catch (URISyntaxException e)
+            {
+                Log.e(HttpUrlRequest.class.getName(), "URISyntaxException:", e);
+            }
+        }
+        if (!isCancelled() && this.responseHandler != null)
+            this.responseHandler.sendResponseMessage(response);
 
     }
 
     @Override
     protected void makeRequestWithRetries() throws IOException
     {
-        boolean retry = true;
         IOException cause = null;
-        // HttpRequestRetryHandler retryHandler =
-        // this.client.getHttpRequestRetryHandler();
+
+        if (this.isCancelled)
+            return;
 
         try
         {
-            while (retry)
-            {
-                try
-                {
-                    makeRequest();
-                    return;
-                } catch (UnknownHostException e)
-                {
-                    cause = new IOException("UnknownHostException :" + e.getMessage());
-                    // retry = (this.executionCount > 0) &&
-                    // retryHandler.retryRequest(cause, ++this.executionCount,
-                    // this.context);
-                } catch (NullPointerException e)
-                {
-                    cause = new IOException("NPE in HttpClient :" + e.getMessage());
-                    // retry = retryHandler.retryRequest(cause,
-                    // ++this.executionCount, this.context);
-                } catch (IOException e)
-                {
-                    if (isCancelled())
-                        return;
-                    cause = e;
-                    // retry = retryHandler.retryRequest(cause,
-                    // ++this.executionCount, this.context);
-                }
-                // if (retry && retryHandler != null)
-                // {
-                // this.responseHandler.sendRetryMessage(this.executionCount);
-                // }
-
-            }
+            makeRequest();
         } catch (Exception e)
         {
             Log.e(this.getClass().getName(), "Caused by unhandled exception :", e);
@@ -98,4 +114,21 @@ public class HttpUrlRequest extends Request
         return isCancelled();
     }
 
+    private HttpEntity entityFromConnection(HttpURLConnection connection)
+    {
+        BasicHttpEntity entity = new BasicHttpEntity();
+        InputStream inputStream;
+        try
+        {
+            inputStream = connection.getInputStream();
+        } catch (IOException ioe)
+        {
+            inputStream = connection.getErrorStream();
+        }
+        entity.setContent(inputStream);
+        entity.setContentLength(connection.getContentLength());
+        entity.setContentEncoding(connection.getContentEncoding());
+        entity.setContentType(connection.getContentType());
+        return entity;
+    }
 }
