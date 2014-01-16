@@ -92,6 +92,9 @@ public abstract class FileResponseHandler extends HttpResponseHandler
             this.bytesTotal = length > 0 ? length : entity.getContent().available();
             Log.i(TAG, "bytesTotal:"+bytesTotal);
 
+            if(this.isCancelled)
+                return null;
+            
             if (this.mFile.exists())
                 throw new IOException("File already exists.");
 
@@ -137,6 +140,9 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                     accessFile.write(buffer, 0, count);
                     updateProgress(count);
                 }
+                if(this.isCancelled)
+                    return null;
+                
                 this.tempFile.renameTo(this.mFile);
 
             } catch (Exception e)

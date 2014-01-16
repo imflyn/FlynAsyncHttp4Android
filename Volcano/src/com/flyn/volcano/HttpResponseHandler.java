@@ -204,6 +204,9 @@ public abstract class HttpResponseHandler implements IResponseHandler
         BufferedInputStream inStream = new BufferedInputStream(entity.getContent());
         if (inStream != null)
         {
+            if(this.isCancelled)
+                return null;
+            
             long contentLength = entity.getContentLength();
             if (contentLength > Integer.MAX_VALUE)
             {
@@ -223,6 +226,8 @@ public abstract class HttpResponseHandler implements IResponseHandler
                     if (contentLength >= 0 && ((count / (contentLength / 100)) % 10 == 0))
                         sendProgressMessage(count, (int) contentLength, 0);// 下载速度暂时设置为0
                 }
+                if(this.isCancelled)
+                    return null;
                 responseData = bytes.toByteArray();
             } catch (OutOfMemoryError e)
             {
