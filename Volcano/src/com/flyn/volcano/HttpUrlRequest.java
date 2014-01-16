@@ -76,7 +76,7 @@ public class HttpUrlRequest extends Request
         Map<String, List<String>> headerFields = this.connection.getHeaderFields();
         if (headerFields != null)
         {
-            List<String> cookies = headerFields.get("Set-Cookie".toLowerCase());
+            List<String> cookies = headerFields.get("set-cookie");
             if (cookies != null)
             {
                 CookieManager cookieManager = CookieManager.getInstance();

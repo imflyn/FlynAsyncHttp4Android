@@ -293,11 +293,13 @@ public class HttpClientStack extends NetStack
      * 
      * @param threadPool
      */
+    @Override
     public void setThreadPool(ThreadPoolExecutor threadPool)
     {
         this.threadPool = threadPool;
     }
 
+    @Override
     public void setEnableRedirects(final boolean enableRedirects)
     {
         this.httpClient.setRedirectHandler(new DefaultRedirectHandler()
@@ -311,11 +313,13 @@ public class HttpClientStack extends NetStack
         });
     }
 
+    @Override
     public void setUserAgent(String userAgent)
     {
         HttpProtocolParams.setUserAgent(this.httpClient.getParams(), userAgent);
     }
 
+    @Override
     public void setMaxConnections(int maxConnections)
     {
         if (maxConnections < 1)
@@ -326,6 +330,7 @@ public class HttpClientStack extends NetStack
 
     }
 
+    @Override
     public void setTimeOut(int timeout)
     {
         if (timeout < 1000)
@@ -336,6 +341,7 @@ public class HttpClientStack extends NetStack
         HttpConnectionParams.setConnectionTimeout(httpParams, this.timeout);
     }
 
+    @Override
     public void setProxy(String hostname, int port)
     {
         final HttpHost proxy = new HttpHost(hostname, port);
@@ -345,6 +351,7 @@ public class HttpClientStack extends NetStack
 
     }
 
+    @Override
     public void setProxy(String hostname, int port, String username, String password)
     {
         this.httpClient.getCredentialsProvider().setCredentials(new AuthScope(hostname, port), new UsernamePasswordCredentials(username, password));
