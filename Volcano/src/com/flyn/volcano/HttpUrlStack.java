@@ -37,9 +37,9 @@ public class HttpUrlStack extends NetStack
     private String              basicAuth;
     private boolean             isAccpetCookies   = true;
 
-    public HttpUrlStack(Context context)
+    protected HttpUrlStack(Context context, boolean isUseSynchronousMode)
     {
-        super(context);
+        super(context, isUseSynchronousMode);
 
         CookieSyncManager.createInstance(context);
         CookieManager cookieManager = CookieManager.getInstance();
@@ -82,7 +82,7 @@ public class HttpUrlStack extends NetStack
         connection.setReadTimeout(this.timeout);
         connection.setUseCaches(false);
         connection.setDoInput(true);
-        connection.setRequestProperty("Connection", "Keep-Alive");  
+        connection.setRequestProperty("Connection", "Keep-Alive");
         if (this.isAccpetCookies)
             connection.setRequestProperty("Cookie", getCookies(parsedUrl));
         if (Utils.CMMAP_Request(this.context))
@@ -119,12 +119,13 @@ public class HttpUrlStack extends NetStack
         if (!TextUtils.isEmpty(contentType))
             connection.addRequestProperty(HEADER_CONTENT_TYPE, contentType);
 
-        // responseHandler.setRequestURI(uriRequest.getURI());
-
         Request request = new HttpUrlRequest(connection, requestParams, responseHandler);
         RequestFuture requestFuture = new RequestFuture(request);
 
-        this.threadPool.submit(request);
+        if (!this.isUseSynchronousMode)
+            this.threadPool.submit(request);
+        else
+            request.run();
 
         if (null != this.context)
         {
@@ -149,37 +150,40 @@ public class HttpUrlStack extends NetStack
     @Override
     public RequestFuture makeRequest(int method, String contentType, String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
     {
-        HttpURLConnection urlConnection =null;
-        String requestMethod="GET";
-        String normalUrl=url;
+        HttpURLConnection urlConnection = null;
+        String requestMethod = "GET";
+        String normalUrl = url;
         try
         {
             switch (method)
             {
                 case Method.GET:
-                    requestMethod="GET";
-//                    normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
+                    requestMethod = "GET";
+                    // normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled,
+                    // url, params);
                     break;
                 case Method.POST:
-                    requestMethod="POST";
-//                    normalUrl=params.getParamString();
+                    requestMethod = "POST";
+                    // normalUrl=params.getParamString();
                     break;
                 case Method.PUT:
-                    requestMethod="PUT";
-//                    normalUrl=params.getParamString();
+                    requestMethod = "PUT";
+                    // normalUrl=params.getParamString();
                     break;
                 case Method.DELETE:
-                    requestMethod="DELETE";
-//                    normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
+                    requestMethod = "DELETE";
+                    // normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled,
+                    // url, params);
                     break;
                 case Method.HEAD:
-                    requestMethod="HEAD";
-//                    normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
+                    requestMethod = "HEAD";
+                    // normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled,
+                    // url, params);
                     break;
                 default:
                     throw new IllegalStateException("Unknown request method.");
             }
-            urlConnection= openConnection(normalUrl, responseHandler);
+            urlConnection = openConnection(normalUrl, responseHandler);
             urlConnection.setRequestMethod(requestMethod);
         } catch (ProtocolException e)
         {
@@ -264,7 +268,6 @@ public class HttpUrlStack extends NetStack
             }
         }
     }
-
 
     public void setBasicAuth(String username, String password)
     {

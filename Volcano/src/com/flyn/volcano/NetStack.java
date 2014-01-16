@@ -25,6 +25,7 @@ public abstract class NetStack
 
     protected ExecutorService                         threadPool;
     protected final boolean                           fixNoHttpResponseException      = false;
+    protected final boolean                           isUseSynchronousMode;
     protected final Map<Context, List<RequestFuture>> requestMap;
     protected final Map<String, String>               httpHeaderMap;
     protected final Context                           context;
@@ -32,13 +33,14 @@ public abstract class NetStack
     protected int                                     timeout                         = DEFAULT_SOCKET_TIMEOUT;
     protected boolean                                 isURLEncodingEnabled            = true;
 
-    public NetStack(Context context)
+    protected NetStack(Context context, boolean isUseSynchronousMode)
     {
         if (context == null)
             throw new IllegalArgumentException("Context can not be null.");
         this.threadPool = Executors.newCachedThreadPool();
         this.requestMap = new WeakHashMap<Context, List<RequestFuture>>();
         this.httpHeaderMap = new HashMap<String, String>();
+        this.isUseSynchronousMode = isUseSynchronousMode;
         this.context = context;
     }
 
@@ -83,6 +85,7 @@ public abstract class NetStack
 
     /**
      * Set it before request started
+     * 
      * @param threadPool
      */
     public void setThreadPool(ThreadPoolExecutor threadPool)
@@ -106,7 +109,5 @@ public abstract class NetStack
     public abstract void setProxy(String hostname, int port);
 
     public abstract void setProxy(String hostname, int port, String username, String password);
-
-
 
 }

@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -66,9 +65,9 @@ public class HttpClientStack extends NetStack
     private final DefaultHttpClient httpClient;
     private final HttpContext       httpContext;
 
-    public HttpClientStack(Context context)
+    protected HttpClientStack(Context context, boolean isUseSynchronousMode)
     {
-        super(context);
+        super(context, isUseSynchronousMode);
         BasicHttpParams httpParams = new BasicHttpParams();
         ConnManagerParams.setTimeout(httpParams, this.timeout);
         ConnManagerParams.setMaxConnectionsPerRoute(httpParams, new ConnPerRouteBean(this.maxConnections));
@@ -248,7 +247,11 @@ public class HttpClientStack extends NetStack
 
         Request request = new HttpClientRequest(client, httpContext, uriRequest, responseHandler);
 
-        this.threadPool.submit(request);
+        if (!this.isUseSynchronousMode)
+            this.threadPool.submit(request);
+        else
+            request.run();
+
         RequestFuture requestHandle = new RequestFuture(request);
 
         if (null != this.context)
@@ -286,17 +289,6 @@ public class HttpClientStack extends NetStack
     public void setCookieStore(CookieStore cookieStore)
     {
         this.httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-    }
-
-    /**
-     * Set it befor request started
-     * 
-     * @param threadPool
-     */
-    @Override
-    public void setThreadPool(ThreadPoolExecutor threadPool)
-    {
-        this.threadPool = threadPool;
     }
 
     @Override

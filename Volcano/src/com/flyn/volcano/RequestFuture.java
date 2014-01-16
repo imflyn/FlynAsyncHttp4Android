@@ -15,15 +15,12 @@ public class RequestFuture
     {
         Request _request = this.request.get();
         return _request == null || _request.cancel(mayInterruptIfRunning);
-
     }
 
     public boolean isFinished()
     {
-
         Request _request = this.request.get();
         return _request == null || _request.isFinished();
-
     }
 
     public boolean isCanceled()
@@ -35,11 +32,9 @@ public class RequestFuture
     public boolean shouldBeGarbageCollected()
     {
         boolean should = isCanceled() || isFinished();
-
         if (should)
             this.request.clear();
         return should;
-
     }
 
 }
