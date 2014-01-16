@@ -179,7 +179,7 @@ public abstract class HttpResponseHandler implements IResponseHandler
             if (response.getEntity() != null)
                 responseData = entityToData(response.getEntity());
             else
-                responseData = new byte[0];
+                responseData = null;
 
             if (!Thread.currentThread().isInterrupted())
             {
