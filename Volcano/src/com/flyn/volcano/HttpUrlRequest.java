@@ -19,7 +19,10 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 
+import android.os.Build;
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 public class HttpUrlRequest extends Request
 {
@@ -41,6 +44,7 @@ public class HttpUrlRequest extends Request
 
         if (null != this.requestParams)
         {
+            this.connection.setDoOutput(true);
             HttpEntity httpEntity = this.requestParams.getEntity(this.responseHandler);
             OutputStream outStream = this.connection.getOutputStream();
             httpEntity.writeTo(outStream);
@@ -68,7 +72,25 @@ public class HttpUrlRequest extends Request
                 response.addHeader(h);
             }
         }
-     
+
+        Map<String, List<String>> headerFields = this.connection.getHeaderFields();
+        if (headerFields != null)
+        {
+            List<String> cookies = headerFields.get("Set-Cookie".toLowerCase());
+            if (cookies != null)
+            {
+                CookieManager cookieManager = CookieManager.getInstance();
+                for (String cookie : cookies)
+                {
+                    if (cookie == null)
+                        continue;
+                    cookieManager.setCookie(this.connection.getURL().toString(), cookie);
+                }
+                if (Build.VERSION.SDK_INT >= 14)
+                    CookieSyncManager.getInstance().sync();
+            }
+        }
+
         if (!isCancelled() && null != this.responseHandler)
         {
             this.responseHandler.setRequestHeaders(headersMap);

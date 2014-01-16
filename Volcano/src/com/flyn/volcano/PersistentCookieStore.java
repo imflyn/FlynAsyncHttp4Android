@@ -7,7 +7,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.http.client.CookieStore;
@@ -159,7 +158,7 @@ public class PersistentCookieStore implements CookieStore
             return null;
         }
 
-        return byteArrayToHexString(os.toByteArray());
+        return Utils.byteArrayToHexString(os.toByteArray());
     }
 
     /**
@@ -171,7 +170,7 @@ public class PersistentCookieStore implements CookieStore
      */
     private Cookie decodeCookie(String cookieString)
     {
-        byte[] bytes = hexStringToByteArray(cookieString);
+        byte[] bytes = Utils.hexStringToByteArray(cookieString);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         Cookie cookie = null;
         try
@@ -186,46 +185,5 @@ public class PersistentCookieStore implements CookieStore
         return cookie;
     }
 
-    /**
-     * Using some super basic byte array &lt;-&gt; hex conversions so we don't
-     * have to rely on any large Base64 libraries. Can be overridden if you
-     * like!
-     * 
-     * @param bytes
-     *            byte array to be converted
-     * @return string containing hex values
-     */
-    private String byteArrayToHexString(byte[] bytes)
-    {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte element : bytes)
-        {
-            int v = element & 0xff;
-            if (v < 16)
-            {
-                sb.append('0');
-            }
-            sb.append(Integer.toHexString(v));
-        }
-        return sb.toString().toUpperCase(Locale.US);
-    }
-
-    /**
-     * Converts hex values from strings to byte arra
-     * 
-     * @param hexString
-     *            string of hex-encoded values
-     * @return decoded byte array
-     */
-    private byte[] hexStringToByteArray(String hexString)
-    {
-        int len = hexString.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2)
-        {
-            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
-        }
-        return data;
-    }
 
 }
