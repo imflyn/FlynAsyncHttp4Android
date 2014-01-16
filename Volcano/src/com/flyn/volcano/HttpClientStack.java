@@ -366,10 +366,8 @@ public class HttpClientStack extends NetStack
 
     public void setBasicAuth(String username, String password, AuthScope authScope)
     {
-
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
         this.httpClient.getCredentialsProvider().setCredentials(authScope, credentials);
-
     }
 
     public void setBasicAuth(String username, String password)
@@ -377,7 +375,12 @@ public class HttpClientStack extends NetStack
         AuthScope scope = AuthScope.ANY;
         setBasicAuth(username, password, scope);
     }
-
+    
+    public void clearBasicAuth()
+    {
+        this.httpClient.getCredentialsProvider().clear();
+    }
+    
     private HttpEntity paramsToEntity(RequestParams params, IResponseHandler responseHandler)
     {
         HttpEntity entity = null;
@@ -398,10 +401,6 @@ public class HttpClientStack extends NetStack
         return entity;
     }
 
-    public void clearBasicAuth()
-    {
-        this.httpClient.getCredentialsProvider().clear();
-    }
 
     static class InflatingEntity extends HttpEntityWrapper
     {

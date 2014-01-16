@@ -8,6 +8,10 @@ import org.apache.http.impl.cookie.DateParseException;
 import org.apache.http.impl.cookie.DateUtils;
 import org.apache.http.protocol.HTTP;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 public class Utils
 {
     /**
@@ -35,7 +39,7 @@ public class Utils
 
         return HTTP.DEFAULT_CONTENT_CHARSET;
     }
-    
+
     /**
      * Parse date in RFC1123 format, and return its value as epoch
      */
@@ -98,5 +102,16 @@ public class Utils
             }
         }
         return url;
+    }
+    
+    
+    public static boolean CMMAP_Request(Context context)
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        String extraInfo = networkInfo.getExtraInfo();
+        if (extraInfo.contains("CMWAP"))
+            return true;
+        return false;
     }
 }

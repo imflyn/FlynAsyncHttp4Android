@@ -8,8 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.apache.http.auth.AuthScope;
-
 import android.content.Context;
 
 public abstract class NetStack
@@ -109,12 +107,6 @@ public abstract class NetStack
 
     public abstract void setProxy(String hostname, int port, String username, String password);
 
-    public abstract void setMaxRetriesAndTimeout(int retries, int timeout);
 
-    public abstract void setBasicAuth(String username, String password, AuthScope authScope);
-
-    public abstract void setBasicAuth(String username, String password);
-
-    public abstract void clearBasicAuth();
 
 }

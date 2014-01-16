@@ -17,10 +17,10 @@ import java.util.Properties;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.http.auth.AuthScope;
-
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
@@ -33,6 +33,8 @@ public class HttpUrlStack extends NetStack
     private boolean             isEnableRedirects = false;
     private SSLSocketFactory    mSslSocketFactory;
     private Proxy               proxy;
+    private String              userAgent;
+    private String              basicAuth;
 
     public HttpUrlStack(Context context)
     {
@@ -52,6 +54,17 @@ public class HttpUrlStack extends NetStack
         try
         {
             url = new URL(parsedUrl);
+
+            // 对移动wap网络的特殊处理
+            if (Utils.CMMAP_Request(this.context))
+            {
+                String myURLStr = "http://10.0.0.172".concat(url.getPath());
+                String query = url.getQuery();
+                if (query != null)
+                    myURLStr = myURLStr.concat("?").concat(query);
+                url = new URL(myURLStr);
+            }
+
             if (null != this.proxy)
                 connection = (HttpURLConnection) url.openConnection(this.proxy);
             else
@@ -61,24 +74,36 @@ public class HttpUrlStack extends NetStack
             if (responseHandler != null)
                 responseHandler.sendFailureMessage(0, null, null, e);
             else
-                e.printStackTrace();
+                Log.e(TAG, "IOException:", e);
         }
 
         connection.setConnectTimeout(this.timeout);
         connection.setReadTimeout(this.timeout);
         connection.setUseCaches(false);
         connection.setDoInput(true);
+
+        if (Utils.CMMAP_Request(this.context))
+            connection.addRequestProperty("X-Online-Host", parsedUrl);
+        if (!TextUtils.isEmpty(this.userAgent))
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+        else
+            connection.setRequestProperty("User-Agent", this.userAgent);
+        if (!TextUtils.isEmpty(this.basicAuth))
+            connection.setRequestProperty("Authorization", this.basicAuth);
+
         HttpURLConnection.setFollowRedirects(this.isEnableRedirects);
         connection.setInstanceFollowRedirects(this.isEnableRedirects);
 
-        if ("https".equals(url.getProtocol()) && mSslSocketFactory == null)
+        if ("https".equals(url.getProtocol()) && this.mSslSocketFactory == null)
         {
             if (this.fixNoHttpResponseException)
                 this.mSslSocketFactory = HttpUrlSSLSocketFactory.getFixedSocketFactory();
             else
                 this.mSslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-        } else
+
             ((HttpsURLConnection) connection).setSSLSocketFactory(this.mSslSocketFactory);
+        }
+
         // Cookies
 
         return connection;
@@ -151,11 +176,12 @@ public class HttpUrlStack extends NetStack
             if (responseHandler != null)
                 responseHandler.sendFailureMessage(0, null, null, e);
             else
-                e.printStackTrace();
+                Log.e(TAG, "ProtocolException:", e);
         }
 
         addHeaders(urlConnection, headers);
-//        responseHandler.setRequestHeaders(headers);
+        // responseHandler.setRequestHeaders(headers);
+        
         return sendRequest(contentType, responseHandler, prepareArguments(urlConnection, params));
     }
 
@@ -165,7 +191,6 @@ public class HttpUrlStack extends NetStack
         {
             urlConnection.addRequestProperty(header.getKey(), header.getValue());
         }
-
     }
 
     private Object[] prepareArguments(HttpURLConnection urlConnection, RequestParams params)
@@ -182,30 +207,39 @@ public class HttpUrlStack extends NetStack
     @Override
     public void setUserAgent(String userAgent)
     {
-        
+        if (!TextUtils.isEmpty(userAgent))
+            this.userAgent = userAgent;
     }
 
     @Override
     public void setMaxConnections(int maxConnections)
     {
-        this.maxConnections = maxConnections;
+        if (timeout > 0)
+            this.maxConnections = maxConnections;
+        else
+            this.timeout = DEFAULT_MAX_CONNETIONS;
     }
 
     @Override
     public void setTimeOut(int timeout)
     {
-        this.timeout = timeout;
+        if (timeout > 0)
+            this.timeout = timeout;
+        else
+            this.timeout = DEFAULT_SOCKET_TIMEOUT;
     }
 
     @Override
     public void setProxy(String host, int port)
     {
+        if(!TextUtils.isEmpty(host)&&port>0)
         this.proxy = new Proxy(Type.HTTP, new InetSocketAddress(host, port));
     }
 
     @Override
     public void setProxy(String host, int port, String username, String password)
     {
+        if(!TextUtils.isEmpty(host)&&port>0)
         this.proxy = new Proxy(Type.HTTP, new InetSocketAddress(host, port));
         Properties propRet = null;
         if (!TextUtils.isEmpty(host))
@@ -221,28 +255,19 @@ public class HttpUrlStack extends NetStack
         }
     }
 
-    @Override
     public void setMaxRetriesAndTimeout(int retries, int timeout)
     {
-           
     }
 
-    @Override
-    public void setBasicAuth(String username, String password, AuthScope authScope)
-    {
-
-    }
-
-    @Override
     public void setBasicAuth(String username, String password)
     {
-
+        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password))
+            this.basicAuth = Base64.encodeToString((username + ":" + password).getBytes(), Base64.DEFAULT);
     }
 
-    @Override
     public void clearBasicAuth()
     {
-
+        this.basicAuth = null;
     }
 
 }
