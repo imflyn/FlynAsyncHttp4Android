@@ -13,6 +13,7 @@ import com.flyn.volcano.FileResponseHandler;
 import com.flyn.volcano.R;
 import com.flyn.volcano.Request.Method;
 import com.flyn.volcano.RequestFuture;
+import com.flyn.volcano.RequestParams;
 import com.flyn.volcano.Volcano;
 
 public class MainActivity extends Activity
@@ -76,10 +77,12 @@ public class MainActivity extends Activity
                 // System.out.println("speed:" + speed);
                 // }
                 // });
+                RequestParams params = new RequestParams();
+                params.putByteRange((int) new File(Environment.getExternalStorageDirectory() + "/yyj","好歌.tmp").length(), -1);
                 if (null == stack)
                 {
                     String url = "http://zhangmenshiting.baidu.com/data2/music/109017153/8930817375600128.mp3?xcode=2a9536886231123c387700702f9919cd17c9e7c86eb6cec7";
-                    stack = Volcano.newNetStack(Volcano.TYPE_HTTP_CLIENT, v.getContext()).makeRequest(Method.GET, null, url, null, null,
+                    stack = Volcano.newNetStack(Volcano.TYPE_HTTP_CLIENT, v.getContext()).makeRequest(Method.GET, null, url, null, params,
                             new FileResponseHandler(Environment.getExternalStorageDirectory() + "/yyj", "好歌.mp3", true)
                             {
 

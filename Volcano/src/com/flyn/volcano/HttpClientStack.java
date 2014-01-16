@@ -180,7 +180,7 @@ public class HttpClientStack extends NetStack
                 {
                     HttpEntity entity = paramsToEntity(params, responseHandler);
                     if (null != entity)
-                        ((HttpResponse) uriRequest).setEntity(entity);
+                        ((HttpPost) uriRequest).setEntity(entity);
                 }
                 break;
             case Method.PUT:
@@ -189,7 +189,7 @@ public class HttpClientStack extends NetStack
                 {
                     HttpEntity entity = paramsToEntity(params, responseHandler);
                     if (null != entity)
-                        ((HttpResponse) uriRequest).setEntity(entity);
+                        ((HttpPut) uriRequest).setEntity(entity);
                 }
                 break;
             case Method.DELETE:

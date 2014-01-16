@@ -113,9 +113,23 @@ public class RequestParams
         }
     }
 
-    public void putByteRange(String startPos, String endPos)
+    /**
+     * 
+     * @param startPos
+     *            if don't want this set this <0
+     * @param endPos
+     *            if don't want this set this <0
+     */
+    public void putByteRange(int startPos, int endPos)
     {
-        this.urlParams.put("Range", "bytes=" + startPos + "-" + endPos);
+        if (startPos < 0 && endPos < 0)
+            return;
+        if (startPos < 0 && endPos > 0)
+            this.urlParams.put("Range", "bytes=" + "-" + endPos);// 最后endPos个字节
+        else if (startPos > 0 && endPos < 0)
+            this.urlParams.put("Range", "bytes=" + startPos + "-");// startPos字节以后的范围
+        else if (startPos > 0 && endPos > 0)
+            this.urlParams.put("Range", "bytes=" + startPos + "-" + endPos);
     }
 
     public void remove(String key)

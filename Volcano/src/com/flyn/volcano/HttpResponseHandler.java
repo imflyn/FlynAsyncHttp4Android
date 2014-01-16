@@ -174,19 +174,17 @@ public abstract class HttpResponseHandler implements IResponseHandler
                 // 还未加入Cache缓存处理,加入后可以添加具体处理逻辑
             }
 
-            byte[] responseData;
-
-            if (response.getEntity() != null)
-                responseData = entityToData(response.getEntity());
-            else
-                responseData = new byte[0];
+            byte[] responseData = new byte[0];
 
             if (!Thread.currentThread().isInterrupted())
             {
-                Log.i(TAG, "statusCode:"+statusCode);
+                Log.i(TAG, "statusCode:" + statusCode);
                 if (statusCode >= 200 && statusCode < 300)
+                {
+                    if (response.getEntity() != null)
+                        responseData = entityToData(response.getEntity());
                     sendSuccessMessage(statusCode, convertHeaders(response.getAllHeaders()), responseData);
-                    else
+                } else
                     sendFailureMessage(statusCode, convertHeaders(response.getAllHeaders()), responseData, new HttpResponseException(statusCode, statusLine.getReasonPhrase()));
             }
         }

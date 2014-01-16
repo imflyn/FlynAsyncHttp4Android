@@ -19,7 +19,7 @@ import android.util.Log;
 public abstract class FileResponseHandler extends HttpResponseHandler
 {
     private final static String TAG           = FileResponseHandler.class.getName();
-    private static List<File>   mFileList     = Collections.synchronizedList(new ArrayList<File>(5));
+    private static List<File>   mFileList     = Collections.synchronizedList(new ArrayList<File>(3));
 
     private long                bytesTotal    = 0;
     private long                bytesWritten  = 0;
@@ -90,15 +90,18 @@ public abstract class FileResponseHandler extends HttpResponseHandler
         {
             long length = entity.getContentLength();
             this.bytesTotal = length > 0 ? length : entity.getContent().available();
-            
-            
+            Log.i(TAG, "bytesTotal:"+bytesTotal);
+
             if (this.mFile.exists())
                 throw new IOException("File already exists.");
 
             if (this.tempFile.exists())
             {
                 if (this.isContinue)
+                {
                     this.bytesWritten = this.tempFile.length();
+                    this.bytesTotal=+this.bytesWritten;
+                }
                 else
                     this.tempFile.delete();
             }
@@ -138,7 +141,7 @@ public abstract class FileResponseHandler extends HttpResponseHandler
 
             } catch (Exception e)
             {
-                throw new IOException("entityToData exception:" + e.getMessage());
+                throw new IOException("EntityToData exception:" + e.getMessage());
             } finally
             {
                 stopTimer();
@@ -166,17 +169,14 @@ public abstract class FileResponseHandler extends HttpResponseHandler
 
         final TimerTask task = new TimerTask()
         {
+            private boolean first = true;
+
             @Override
             public void run()
             {
                 if (isScheduleing && !Thread.currentThread().isInterrupted())
                 {
                     long nowTime = System.currentTimeMillis();
-                    if (timeStamp == 0)
-                    {
-                        timeStamp = System.currentTimeMillis();
-                        return;
-                    }
 
                     long spendTime = nowTime - timeStamp;
                     timeStamp = nowTime;
@@ -186,7 +186,12 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                     if (spendTime > 0)
                         currentSpeed = (int) ((getSize / spendTime) / 1.024);
 
-                    sendProgressMessage((int) bytesWritten, (int) bytesTotal, currentSpeed);
+                    if (!first)
+                        sendProgressMessage((int) bytesWritten, (int) bytesTotal, currentSpeed);
+                    else
+                        first = false;
+                    
+                    
                 } else
                 {
                     stopTimer();
