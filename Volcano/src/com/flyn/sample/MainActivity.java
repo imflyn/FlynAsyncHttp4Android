@@ -24,7 +24,7 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
         findViewById(R.id.button1).setOnClickListener(new OnClickListener()
         {
- 
+
             @Override
             public void onClick(View v)
             {
