@@ -22,6 +22,6 @@ public class HttpException extends Exception
     public HttpException(String exceptionMessage, Throwable reason)
     {
         super(exceptionMessage, reason);
-    }    
-    
+    }
+
 }

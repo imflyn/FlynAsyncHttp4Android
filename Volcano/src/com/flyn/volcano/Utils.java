@@ -110,8 +110,7 @@ public class Utils
         }
         return url;
     }
-    
-    
+
     public static boolean CMMAP_Request(Context context)
     {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
@@ -121,8 +120,7 @@ public class Utils
             return true;
         return false;
     }
-    
-    
+
     public static KeyStore getKeystoreOfCA(InputStream cert)
     {
 
@@ -170,8 +168,7 @@ public class Utils
         }
         return trustStore;
     }
-    
-    
+
     /**
      * Using some super basic byte array &lt;-&gt; hex conversions so we don't
      * have to rely on any large Base64 libraries. Can be overridden if you

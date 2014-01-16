@@ -21,7 +21,6 @@ public class Volcano
 
     }
 
-
     public static NetStack newNetStack(Context context)
     {
         return newNetStack(TYPE_HTTP_URLCONNECT, context, false);

@@ -38,23 +38,23 @@ public class HttpClientSSLSocketFactory extends SSLSocketFactory
         super(truststore);
         this.sslContext.init(null, new TrustManager[] { new X509TrustManager()
         {
-            
+
             @Override
             public X509Certificate[] getAcceptedIssuers()
             {
                 return null;
             }
-            
+
             @Override
             public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException
             {
-                
+
             }
-            
+
             @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException
             {
-                
+
             }
         } }, null);
     }
@@ -75,8 +75,6 @@ public class HttpClientSSLSocketFactory extends SSLSocketFactory
     {
         HttpsURLConnection.setDefaultSSLSocketFactory(this.sslContext.getSocketFactory());
     }
-
-  
 
     public static SSLSocketFactory getFixedSocketFactory()
     {

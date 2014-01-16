@@ -129,7 +129,7 @@ class MultipartUploader implements HttpEntity
 
         this.out.write(CR_LF);
         this.out.flush();
-        
+
         Utils.quickClose(inputStream);
     }
 
@@ -244,7 +244,7 @@ class MultipartUploader implements HttpEntity
             out.write(CR_LF);
             updateProgress(CR_LF.length);
             out.flush();
-            
+
             Utils.quickClose(inputStream);
         }
     }

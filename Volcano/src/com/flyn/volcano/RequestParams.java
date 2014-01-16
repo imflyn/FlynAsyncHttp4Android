@@ -161,9 +161,9 @@ public class RequestParams
     protected HttpEntity createMultipartEntity(IResponseHandler progressHandler) throws IOException
     {
         MultipartEntity entity = new MultipartEntity(progressHandler);
-                
+
         entity.setIsRepeatable(this.isRepeatable);
-        
+
         for (ConcurrentHashMap.Entry<String, String> entry : this.urlParams.entrySet())
         {
             entity.addPart(entry.getKey(), entry.getValue());

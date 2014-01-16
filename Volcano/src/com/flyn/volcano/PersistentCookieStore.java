@@ -17,11 +17,11 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
-
 /**
  * Useing SharedPreferences to save Cookies
+ * 
  * @author V
- *
+ * 
  */
 public class PersistentCookieStore implements CookieStore
 {
@@ -184,6 +184,5 @@ public class PersistentCookieStore implements CookieStore
 
         return cookie;
     }
-
 
 }
