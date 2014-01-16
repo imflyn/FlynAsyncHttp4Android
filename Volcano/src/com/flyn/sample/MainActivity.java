@@ -24,7 +24,7 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
         findViewById(R.id.button1).setOnClickListener(new OnClickListener()
         {
-
+ 
             @Override
             public void onClick(View v)
             {
@@ -74,7 +74,7 @@ public class MainActivity extends Activity
                 // System.out.println("speed:" + speed);
                 // }
                 // });
-                String url = "http://zhangmenshiting.baidu.com/data2/music/107086402/10706222072000128.mp3?xcode=8b0519936846f40ccdd20257df171faa9ce5af4687d9aaa6";
+                String url = "http://zhangmenshiting.baidu.com/data2/music/109017153/8930817375600128.mp3?xcode=2a9536886231123c387700702f9919cd17c9e7c86eb6cec7";
                 Volcano.newNetStack(Volcano.TYPE_HTTP_CLIENT, v.getContext()).makeRequest(Method.GET, null, url, null, null,
                         new FileResponseHandler(Environment.getExternalStorageDirectory() + "/yyj", "好歌.mp3", true)
                         {
