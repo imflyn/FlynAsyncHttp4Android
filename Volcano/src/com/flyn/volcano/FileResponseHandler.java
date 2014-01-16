@@ -100,7 +100,7 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                 if (this.isContinue)
                 {
                     this.bytesWritten = this.tempFile.length();
-                    this.bytesTotal=+this.bytesWritten;
+                    this.bytesTotal+=this.bytesWritten;
                 }
                 else
                     this.tempFile.delete();

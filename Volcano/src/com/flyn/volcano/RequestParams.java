@@ -126,9 +126,9 @@ public class RequestParams
             return;
         if (startPos < 0 && endPos > 0)
             this.urlParams.put("Range", "bytes=" + "-" + endPos);// 最后endPos个字节
-        else if (startPos > 0 && endPos < 0)
+        else if (startPos >= 0 && endPos < 0)
             this.urlParams.put("Range", "bytes=" + startPos + "-");// startPos字节以后的范围
-        else if (startPos > 0 && endPos > 0)
+        else if (startPos >= 0 && endPos > 0)
             this.urlParams.put("Range", "bytes=" + startPos + "-" + endPos);
     }
 
