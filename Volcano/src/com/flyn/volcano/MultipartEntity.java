@@ -43,6 +43,7 @@ class MultipartEntity implements HttpEntity
     private byte[]                       boundaryLine;
     private byte[]                       boundaryEnd;
     private boolean                      isRepeatable             = false;
+    private boolean                      mQuit                    = false;
 
     private List<FilePart>               fileParts                = new LinkedList<FilePart>();
 
@@ -208,8 +209,6 @@ class MultipartEntity implements HttpEntity
             this.timer = null;
         }
     }
-
-    boolean mQuit = false;
 
     protected void stop()
     {
