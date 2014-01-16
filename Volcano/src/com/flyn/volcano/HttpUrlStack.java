@@ -17,6 +17,8 @@ import java.util.Properties;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.apache.http.protocol.HTTP;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -82,15 +84,17 @@ public class HttpUrlStack extends NetStack
         connection.setReadTimeout(this.timeout);
         connection.setUseCaches(false);
         connection.setDoInput(true);
+        connection.setRequestProperty("Charsert", HTTP.UTF_8);
         connection.setRequestProperty("Connection", "Keep-Alive");
         if (this.isAccpetCookies)
             connection.setRequestProperty("Cookie", getCookies(parsedUrl));
         if (Utils.CMMAP_Request(this.context))
             connection.addRequestProperty("X-Online-Host", parsedUrl);
         if (!TextUtils.isEmpty(this.userAgent))
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-        else
             connection.setRequestProperty("User-Agent", this.userAgent);
+        else
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+
         if (!TextUtils.isEmpty(this.basicAuth))
             connection.setRequestProperty("Authorization", this.basicAuth);
 
@@ -120,6 +124,7 @@ public class HttpUrlStack extends NetStack
             connection.addRequestProperty(HEADER_CONTENT_TYPE, contentType);
 
         Request request = new HttpUrlRequest(connection, requestParams, responseHandler);
+
         RequestFuture requestFuture = new RequestFuture(request);
 
         if (!this.isUseSynchronousMode)

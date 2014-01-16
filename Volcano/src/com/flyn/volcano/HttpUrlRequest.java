@@ -47,7 +47,7 @@ public class HttpUrlRequest extends Request
         if (null != this.requestParams)
         {
             this.connection.setDoOutput(true);
-            this.httpEntity = this.requestParams.getEntity(responseHandler);
+            this.httpEntity = this.requestParams.getEntity(this.responseHandler);
             OutputStream outStream = this.connection.getOutputStream();
             if (null != this.httpEntity)
                 this.httpEntity.writeTo(outStream);
@@ -136,6 +136,8 @@ public class HttpUrlRequest extends Request
         this.isCancelled = true;
         if (this.httpEntity != null && this.httpEntity instanceof MultipartEntity)
             ((MultipartEntity) this.httpEntity).stop();
+        
+        this.responseHandler.cancel();
         return isCancelled();
     }
 

@@ -132,7 +132,7 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                 int count;
                 byte[] buffer = new byte[4096];
 
-                while ((count = inputStream.read(buffer)) != -1)
+                while (isCancelled&&(count = inputStream.read(buffer)) != -1)
                 {
                     accessFile.write(buffer, 0, count);
                     updateProgress(count);
