@@ -14,7 +14,6 @@ import com.flyn.volcano.FileResponseHandler;
 import com.flyn.volcano.R;
 import com.flyn.volcano.Request.Method;
 import com.flyn.volcano.RequestFuture;
-import com.flyn.volcano.RequestParams;
 import com.flyn.volcano.Volcano;
 
 public class MainActivity extends Activity

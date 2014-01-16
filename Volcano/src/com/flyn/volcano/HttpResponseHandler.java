@@ -40,7 +40,7 @@ public abstract class HttpResponseHandler implements IResponseHandler
     private boolean             useSynchronousMode  = false;
     private URI                 requestURI          = null;
     private Map<String, String> requestHeaders      = null;
-    protected boolean isCancelled=false;
+    protected boolean           isCancelled         = false;
 
     public HttpResponseHandler()
     {
@@ -115,10 +115,10 @@ public abstract class HttpResponseHandler implements IResponseHandler
     {
 
     }
-    
+
     public void cancel()
     {
-        this.isCancelled=true;
+        this.isCancelled = true;
     }
 
     protected abstract void onSuccess(int statusCode, Map<String, String> headers, byte[] responseBody);
@@ -170,7 +170,7 @@ public abstract class HttpResponseHandler implements IResponseHandler
     @Override
     public void sendResponseMessage(HttpResponse response) throws IOException
     {
-        if (!Thread.currentThread().isInterrupted()&&isCancelled)
+        if (!Thread.currentThread().isInterrupted() && !isCancelled)
         {
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
@@ -182,7 +182,7 @@ public abstract class HttpResponseHandler implements IResponseHandler
 
             byte[] responseData = new byte[0];
 
-            if (!Thread.currentThread().isInterrupted()&&isCancelled)
+            if (!Thread.currentThread().isInterrupted() && !isCancelled)
             {
                 Log.i(TAG, "statusCode:" + statusCode);
                 if (statusCode >= 200 && statusCode < 300)
@@ -217,7 +217,7 @@ public abstract class HttpResponseHandler implements IResponseHandler
             {
                 buffer = mPool.getBuf(1024);
                 int count;
-                while (isCancelled&&(count = inStream.read(buffer)) != -1 && !Thread.currentThread().isInterrupted())
+                while (!isCancelled && (count = inStream.read(buffer)) != -1 && !Thread.currentThread().isInterrupted())
                 {
                     bytes.write(buffer, 0, count);
                     if (contentLength >= 0 && ((count / (contentLength / 100)) % 10 == 0))
