@@ -11,10 +11,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.flyn.volcano.R;
+import com.flyn.volcano.Request.Method;
 import com.flyn.volcano.RequestParams;
 import com.flyn.volcano.StringResponseHandler;
 import com.flyn.volcano.Volcano;
-import com.flyn.volcano.Request.Method;
 
 public class MainActivity extends Activity
 {

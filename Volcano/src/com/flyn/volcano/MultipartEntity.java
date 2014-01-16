@@ -49,7 +49,7 @@ class MultipartEntity implements HttpEntity
     private PoolingByteArrayOutputStream out;
     private ByteArrayPool                mPool;
 
-    private IResponseHandler             progressHandler;
+    private final IResponseHandler       progressHandler;
 
     private int                          bytesWritten             = 0;
     private int                          totalSize                = 0;
@@ -82,6 +82,9 @@ class MultipartEntity implements HttpEntity
 
     public void addPart(final String key, final String value, final String contentType)
     {
+        if(this.mQuit)
+            return ;
+        
         try
         {
             this.out.write(this.boundaryLine);
@@ -112,11 +115,15 @@ class MultipartEntity implements HttpEntity
         {
             type = APPLICATION_OCTET_STREAM;
         }
+        if(this.mQuit)
+            return ;
         this.fileParts.add(new FilePart(key, file, type));
     }
 
     public void addPart(String key, String streamName, InputStream inputStream, String type) throws IOException
     {
+        if(this.mQuit)
+            return ;
         if (type == null)
         {
             type = APPLICATION_OCTET_STREAM;
@@ -132,11 +139,11 @@ class MultipartEntity implements HttpEntity
         // Stream (file)
         final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
         int l;
-        while ((l = inputStream.read(tmp)) != -1)
+        while (!mQuit&&(l = inputStream.read(tmp)) != -1)
         {
             this.out.write(tmp, 0, l);
         }
-
+      
         this.out.write(CR_LF);
         this.out.flush();
 
@@ -201,6 +208,13 @@ class MultipartEntity implements HttpEntity
             this.timer = null;
         }
     }
+    
+    volatile boolean mQuit=false;
+    protected void stop()
+    {
+        this.mQuit=true;
+        stopTimer();
+    }
 
     private class FilePart
     {
@@ -215,6 +229,7 @@ class MultipartEntity implements HttpEntity
 
         private byte[] createHeader(String key, String filename, String type)
         {
+            
             ByteArrayOutputStream headerStream = new ByteArrayOutputStream();
             try
             {
@@ -240,13 +255,16 @@ class MultipartEntity implements HttpEntity
 
         public void writeTo(OutputStream out) throws IOException
         {
+            if(mQuit)
+                return ;
+            
             out.write(this.header);
             updateProgress(this.header.length);
 
             BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(this.file));
             final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
             int l;
-            while ((l = inputStream.read(tmp)) != -1)
+            while (!mQuit&&(l = inputStream.read(tmp)) != -1)
             {
                 out.write(tmp, 0, l);
                 updateProgress(l);
@@ -308,6 +326,8 @@ class MultipartEntity implements HttpEntity
     @Override
     public void writeTo(final OutputStream outstream) throws IOException
     {
+        if(this.mQuit)
+            return ;
         try
         {
             startTimer();
@@ -317,8 +337,12 @@ class MultipartEntity implements HttpEntity
 
             for (FilePart filePart : this.fileParts)
             {
+                if(this.mQuit)
+                    return ;
                 filePart.writeTo(outstream);
             }
+            if(this.mQuit)
+                return ;
             outstream.write(this.boundaryEnd);
             updateProgress(this.boundaryEnd.length);
 

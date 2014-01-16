@@ -192,9 +192,8 @@ public class HttpUrlStack extends NetStack
             else
                 Log.e(TAG, "ProtocolException:", e);
         }
-
+        if(null!=headers)
         addHeaders(urlConnection, headers);
-        // responseHandler.setRequestHeaders(headers);
 
         return sendRequest(contentType, responseHandler, prepareArguments(urlConnection, params));
     }

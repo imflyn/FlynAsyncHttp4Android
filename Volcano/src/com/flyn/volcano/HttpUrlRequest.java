@@ -28,12 +28,14 @@ public class HttpUrlRequest extends Request
 {
     private final HttpURLConnection connection;
     private final RequestParams     requestParams;
+    private HttpEntity              httpEntity;
 
     public HttpUrlRequest(HttpURLConnection connection, RequestParams requestParams, IResponseHandler responseHandler)
     {
         super(responseHandler);
         this.connection = connection;
         this.requestParams = requestParams;
+
     }
 
     @Override
@@ -45,9 +47,10 @@ public class HttpUrlRequest extends Request
         if (null != this.requestParams)
         {
             this.connection.setDoOutput(true);
-            HttpEntity httpEntity = this.requestParams.getEntity(this.responseHandler);
+            this.httpEntity = this.requestParams.getEntity(responseHandler);
             OutputStream outStream = this.connection.getOutputStream();
-            httpEntity.writeTo(outStream);
+            if (null != this.httpEntity)
+                this.httpEntity.writeTo(outStream);
         }
 
         ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 1);
@@ -133,6 +136,8 @@ public class HttpUrlRequest extends Request
     public boolean cancel(boolean mayInterruptIfRunning)
     {
         this.isCancelled = true;
+        if (this.httpEntity != null && this.httpEntity instanceof MultipartEntity)
+            ((MultipartEntity) this.httpEntity).stop();
         return isCancelled();
     }
 
