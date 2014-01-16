@@ -14,24 +14,25 @@ import java.util.TimerTask;
 import org.apache.http.HttpEntity;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 public abstract class FileResponseHandler extends HttpResponseHandler
 {
+    private final static String TAG           = FileResponseHandler.class.getName();
+    private static List<File>   mFileList     = Collections.synchronizedList(new ArrayList<File>(5));
 
-    private static List<File> mFileList     = Collections.synchronizedList(new ArrayList<File>(5));
+    private long                bytesTotal    = 0;
+    private long                bytesWritten  = 0;
 
-    private long              bytesTotal    = 0;
-    private long              bytesWritten  = 0;
+    private final File          mFile;
+    private final File          tempFile;
 
-    private File              mFile;
-    private File              tempFile;
-
-    private Timer             timer;
-    private boolean           isScheduleing = true;
-    private long              timeStamp     = System.currentTimeMillis();
-    private long              sizeStamp     = 0;
-    private int               currentSpeed  = 0;
-    private boolean           isContinue    = false;
+    private Timer               timer;
+    private boolean             isScheduleing = true;
+    private long                timeStamp     = 0;
+    private long                sizeStamp     = 0;
+    private int                 currentSpeed  = 0;
+    private boolean             isContinue    = false;
 
     /**
      * 
@@ -43,7 +44,7 @@ public abstract class FileResponseHandler extends HttpResponseHandler
     {
         super();
         if (TextUtils.isEmpty(savePath) || TextUtils.isEmpty(fileName))
-            return;
+            throw new IllegalArgumentException("Savepath or filename can't be null.");
 
         this.isContinue = isContinue;
 
@@ -87,10 +88,10 @@ public abstract class FileResponseHandler extends HttpResponseHandler
     {
         if (null != entity)
         {
-
             long length = entity.getContentLength();
-            this.bytesTotal = length != -1 ? length : entity.getContent().available();
-
+            this.bytesTotal = length > 0 ? length : entity.getContent().available();
+            
+            
             if (this.mFile.exists())
                 throw new IOException("File already exists.");
 
@@ -171,6 +172,12 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                 if (isScheduleing && !Thread.currentThread().isInterrupted())
                 {
                     long nowTime = System.currentTimeMillis();
+                    if (timeStamp == 0)
+                    {
+                        timeStamp = System.currentTimeMillis();
+                        return;
+                    }
+
                     long spendTime = nowTime - timeStamp;
                     timeStamp = nowTime;
 
@@ -186,7 +193,7 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                 }
             }
         };
-        this.timer.schedule(task, 500, 2000);
+        this.timer.schedule(task, 200, 1500);
     }
 
     private void stopTimer()

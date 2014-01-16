@@ -179,13 +179,14 @@ public abstract class HttpResponseHandler implements IResponseHandler
             if (response.getEntity() != null)
                 responseData = entityToData(response.getEntity());
             else
-                responseData = null;
+                responseData = new byte[0];
 
             if (!Thread.currentThread().isInterrupted())
             {
+                Log.i(TAG, "statusCode:"+statusCode);
                 if (statusCode >= 200 && statusCode < 300)
                     sendSuccessMessage(statusCode, convertHeaders(response.getAllHeaders()), responseData);
-                else
+                    else
                     sendFailureMessage(statusCode, convertHeaders(response.getAllHeaders()), responseData, new HttpResponseException(statusCode, statusLine.getReasonPhrase()));
             }
         }

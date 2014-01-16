@@ -12,10 +12,12 @@ import android.view.View.OnClickListener;
 import com.flyn.volcano.FileResponseHandler;
 import com.flyn.volcano.R;
 import com.flyn.volcano.Request.Method;
+import com.flyn.volcano.RequestFuture;
 import com.flyn.volcano.Volcano;
 
 public class MainActivity extends Activity
 {
+    RequestFuture stack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,31 +76,38 @@ public class MainActivity extends Activity
                 // System.out.println("speed:" + speed);
                 // }
                 // });
-                String url = "http://zhangmenshiting.baidu.com/data2/music/109017153/8930817375600128.mp3?xcode=2a9536886231123c387700702f9919cd17c9e7c86eb6cec7";
-                Volcano.newNetStack(Volcano.TYPE_HTTP_CLIENT, v.getContext()).makeRequest(Method.GET, null, url, null, null,
-                        new FileResponseHandler(Environment.getExternalStorageDirectory() + "/yyj", "好歌.mp3", true)
-                        {
-
-                            @Override
-                            public void onSuccess(int statusCode, Map<String, String> headers, File file)
+                if (null == stack)
+                {
+                    String url = "http://zhangmenshiting.baidu.com/data2/music/109017153/8930817375600128.mp3?xcode=2a9536886231123c387700702f9919cd17c9e7c86eb6cec7";
+                    stack = Volcano.newNetStack(Volcano.TYPE_HTTP_CLIENT, v.getContext()).makeRequest(Method.GET, null, url, null, null,
+                            new FileResponseHandler(Environment.getExternalStorageDirectory() + "/yyj", "好歌.mp3", true)
                             {
-                                System.out.println(file.getName());
-                            }
 
-                            @Override
-                            public void onFailure(int statusCode, Map<String, String> headers, Throwable e)
-                            {
-                                e.printStackTrace();
-                            }
+                                @Override
+                                public void onSuccess(int statusCode, Map<String, String> headers, File file)
+                                {
+                                    System.out.println(file.getName());
+                                }
 
-                            @Override
-                            public void onProgress(int bytesWritten, int bytesTotal, int speed)
-                            {
-                                System.out.println("bytesWritten:" + bytesWritten);
-                                System.out.println("bytesTotal:" + bytesTotal);
-                                System.out.println("speed:" + speed);
-                            }
-                        });
+                                @Override
+                                public void onFailure(int statusCode, Map<String, String> headers, Throwable e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+                                @Override
+                                public void onProgress(int bytesWritten, int bytesTotal, int speed)
+                                {
+                                    System.out.println("bytesWritten:" + bytesWritten);
+                                    System.out.println("bytesTotal:" + bytesTotal);
+                                    System.out.println("speed:" + speed);
+                                }
+                            });
+                } else
+                {
+                    stack.cancel(true);
+                    stack = null;
+                }
             }
         });
     }
