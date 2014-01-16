@@ -189,6 +189,9 @@ public abstract class HttpResponseHandler implements IResponseHandler
                 {
                     if (response.getEntity() != null)
                         responseData = entityToData(response.getEntity());
+                    
+                    if(this.isCancelled)
+                        return ;
                     sendSuccessMessage(statusCode, convertHeaders(response.getAllHeaders()), responseData);
                 } else
                     sendFailureMessage(statusCode, convertHeaders(response.getAllHeaders()), responseData, new HttpResponseException(statusCode, statusLine.getReasonPhrase()));
