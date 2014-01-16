@@ -56,6 +56,8 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.flyn.volcano.Request.Method;
+
 public class HttpClientStack extends NetStack
 {
 
@@ -164,55 +166,47 @@ public class HttpClientStack extends NetStack
         return schemeRegistry;
     }
 
-    protected RequestFuture get( String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
+    @Override
+    public RequestFuture makeRequest(int method, String contentType, String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
     {
-        HttpGet request = new HttpGet(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
-        addHeaders(request, headers);
-        return sendRequest( null, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
-
-    }
-
-    protected RequestFuture post( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
-    {
-        HttpPost request = new HttpPost(url);
-        if (null != params)
+        HttpUriRequest uriRequest = null;
+        switch (method)
         {
-            HttpEntity entity = paramsToEntity(params, responseHandler);
-            if (null != entity)
-                request.setEntity(entity);
+            case Method.GET:
+                uriRequest = new HttpGet(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+                break;
+            case Method.POST:
+                uriRequest = new HttpPost(url);
+                if (null != params)
+                {
+                    HttpEntity entity = paramsToEntity(params, responseHandler);
+                    if (null != entity)
+                        ((HttpResponse) uriRequest).setEntity(entity);
+                }
+                break;
+            case Method.PUT:
+                uriRequest = new HttpPut(url);
+                if (null != params)
+                {
+                    HttpEntity entity = paramsToEntity(params, responseHandler);
+                    if (null != entity)
+                        ((HttpResponse) uriRequest).setEntity(entity);
+                }
+                break;
+            case Method.DELETE:
+                uriRequest = new HttpDelete(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+                break;
+            case Method.HEAD:
+                uriRequest = new HttpHead(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
+                break;
+            default:
+                throw new IllegalStateException("Unknown request method.");
         }
-        addHeaders(request, headers);
-        return sendRequest( contentType, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
+        addHeaders(uriRequest, headers);
+        return sendRequest(contentType, responseHandler, prepareArguments(this.httpClient, this.httpContext, uriRequest));
     }
 
-    protected RequestFuture delete(String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
-    {
-        HttpDelete request = new HttpDelete(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
-        addHeaders(request, headers);
-        return sendRequest( null, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
-    }
-
-    protected RequestFuture put( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
-    {
-        HttpPut request = new HttpPut(url);
-        if (null != params)
-        {
-            HttpEntity entity = paramsToEntity(params, responseHandler);
-            if (null != entity)
-                request.setEntity(entity);
-        }
-        addHeaders(request, headers);
-        return sendRequest(contentType, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
-    }
-
-    protected RequestFuture head( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler)
-    {
-        HttpUriRequest request = new HttpHead(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
-        addHeaders(request, headers);
-        return sendRequest( contentType, responseHandler, prepareArgument(this.httpClient, this.httpContext, request));
-    }
-
-    private Object[] prepareArgument(DefaultHttpClient client, HttpContext httpContext, HttpUriRequest uriRequest)
+    private Object[] prepareArguments(DefaultHttpClient client, HttpContext httpContext, HttpUriRequest uriRequest)
     {
         return new Object[] { client, httpContext, uriRequest };
     }
@@ -229,7 +223,7 @@ public class HttpClientStack extends NetStack
     }
 
     @Override
-    protected RequestFuture sendRequest( String contentType, IResponseHandler responseHandler, Object[] objs)
+    protected RequestFuture sendRequest(String contentType, IResponseHandler responseHandler, Object[] objs)
     {
         final DefaultHttpClient client = (DefaultHttpClient) objs[0];
         final HttpContext httpContext = (HttpContext) objs[1];
@@ -391,7 +385,6 @@ public class HttpClientStack extends NetStack
         {
             if (params != null)
             {
-
                 if (params instanceof HttpClientRequestParams)
                     entity = ((HttpClientRequestParams) params).getEntity(responseHandler);
             }
@@ -402,7 +395,6 @@ public class HttpClientStack extends NetStack
             else
                 t.printStackTrace();
         }
-
         return entity;
     }
 
@@ -432,4 +424,5 @@ public class HttpClientStack extends NetStack
         }
 
     }
+
 }

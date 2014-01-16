@@ -12,8 +12,6 @@ import org.apache.http.auth.AuthScope;
 
 import android.content.Context;
 
-import com.flyn.volcano.Request.Method;
-
 public abstract class NetStack
 {
     protected static final int                        DEFAULT_MAX_CONNETIONS          = 10;
@@ -31,57 +29,24 @@ public abstract class NetStack
     protected final boolean                           fixNoHttpResponseException      = false;
     protected final Map<Context, List<RequestFuture>> requestMap;
     protected final Map<String, String>               httpHeaderMap;
-    protected final Context             context;
+    protected final Context                           context;
     protected int                                     maxConnections                  = DEFAULT_MAX_CONNETIONS;
     protected int                                     timeout                         = DEFAULT_SOCKET_TIMEOUT;
     protected boolean                                 isURLEncodingEnabled            = true;
 
     public NetStack(Context context)
     {
+        if (context == null)
+            throw new IllegalArgumentException("Context can not be null");
         this.threadPool = Executors.newCachedThreadPool();
         this.requestMap = new WeakHashMap<Context, List<RequestFuture>>();
         this.httpHeaderMap = new HashMap<String, String>();
-        this.context=context;
+        this.context = context;
     }
 
-    protected abstract RequestFuture sendRequest( String contentType, IResponseHandler responseHandler, Object[] objs);
+    protected abstract RequestFuture sendRequest(String contentType, IResponseHandler responseHandler, Object[] objs);
 
-    protected abstract RequestFuture get( String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler);
-
-    protected abstract RequestFuture post(String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler);
-
-    protected abstract RequestFuture delete( String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler);
-
-    protected abstract RequestFuture put( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler);
-
-    protected abstract RequestFuture head( String url, Map<String, String> headers, RequestParams params, String contentType, IResponseHandler responseHandler);
-
-    public RequestFuture makeRequest(int method, String contentType, String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
-    {
-
-        RequestFuture requestHandle = null;
-        switch (method)
-        {
-            case Method.GET:
-                requestHandle = get(url, headers, params, responseHandler);
-                break;
-            case Method.POST:
-                requestHandle = post(url, headers, params, contentType, responseHandler);
-                break;
-            case Method.PUT:
-                requestHandle = put( url, headers, params, contentType, responseHandler);
-                break;
-            case Method.DELETE:
-                requestHandle = delete(url, headers, params, responseHandler);
-                break;
-            case Method.HEAD:
-                requestHandle = head(url, headers, params, contentType, responseHandler);
-                break;
-            default:
-                throw new IllegalStateException("Unknown request method.");
-        }
-        return requestHandle;
-    }
+    public abstract RequestFuture makeRequest(int method, String contentType, String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler);
 
     public int getMaxConnections()
     {
@@ -120,7 +85,6 @@ public abstract class NetStack
 
     /**
      * Set it before request started
-     * 
      * @param threadPool
      */
     public void setThreadPool(ThreadPoolExecutor threadPool)
@@ -132,7 +96,6 @@ public abstract class NetStack
     {
         return this.timeout;
     }
-
 
     public abstract void setEnableRedirects(final boolean enableRedirects);
 
