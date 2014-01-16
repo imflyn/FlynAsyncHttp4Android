@@ -209,7 +209,7 @@ class MultipartEntity implements HttpEntity
         }
     }
     
-    volatile boolean mQuit=false;
+     boolean mQuit=false;
     protected void stop()
     {
         this.mQuit=true;

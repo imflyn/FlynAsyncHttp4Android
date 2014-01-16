@@ -36,11 +36,8 @@ public abstract class FileResponseHandler extends HttpResponseHandler
     /**
      * 
      * @param savePath
-     *            存储路径
      * @param fileName
-     *            文件名
      * @param isContinue
-     *            是否断点续传
      */
     public FileResponseHandler(String savePath, String fileName, boolean isContinue)
     {

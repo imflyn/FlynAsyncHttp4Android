@@ -1,7 +1,6 @@
 package com.flyn.sample;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Map;
 
 import android.app.Activity;
@@ -10,10 +9,9 @@ import android.os.Environment;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import com.flyn.volcano.FileResponseHandler;
 import com.flyn.volcano.R;
 import com.flyn.volcano.Request.Method;
-import com.flyn.volcano.RequestParams;
-import com.flyn.volcano.StringResponseHandler;
 import com.flyn.volcano.Volcano;
 
 public class MainActivity extends Activity
@@ -30,44 +28,77 @@ public class MainActivity extends Activity
             @Override
             public void onClick(View v)
             {
-                RequestParams params = new RequestParams();
-                try
-                {
-                    params.put("aa", new File(Environment.getExternalStorageDirectory() + File.separator + "yyj" + File.separator + "aa.jpg"));
-                } catch (FileNotFoundException e)
-                {
-                    e.printStackTrace();
-                }
-                try
-                {
-                    params.put("aa", new File(Environment.getExternalStorageDirectory() + File.separator + "yyj" + File.separator + "ok.mp3"));
-                } catch (FileNotFoundException e)
-                {
-                    e.printStackTrace();
-                }
-                Volcano.newNetStack(v.getContext()).makeRequest(Method.POST, null, "http://www.qq.com", null, params, new StringResponseHandler()
-                {
+                // RequestParams params = new RequestParams();
+                // try
+                // {
+                // params.put("aa", new
+                // File(Environment.getExternalStorageDirectory() +
+                // File.separator + "yyj" + File.separator + "aa.jpg"));
+                // } catch (FileNotFoundException e)
+                // {
+                // e.printStackTrace();
+                // }
+                // try
+                // {
+                // params.put("aa", new
+                // File(Environment.getExternalStorageDirectory() +
+                // File.separator + "yyj" + File.separator + "ok.mp3"));
+                // } catch (FileNotFoundException e)
+                // {
+                // e.printStackTrace();
+                // }
+                // Volcano.newNetStack(v.getContext()).makeRequest(Method.POST,
+                // null, "http://www.qq.com", null, params, new
+                // StringResponseHandler()
+                // {
+                //
+                // @Override
+                // protected void onFailure(int statusCode, Map<String, String>
+                // headers, byte[] responseBody, Throwable error)
+                // {
+                // error.printStackTrace();
+                // }
+                //
+                // @Override
+                // public void onSuccess(int status, String content)
+                // {
+                // System.out.println(content);
+                // }
+                //
+                // @Override
+                // public void onProgress(int bytesWritten, int bytesTotal, int
+                // speed)
+                // {
+                // System.out.println("bytesWritten:" + bytesWritten);
+                // System.out.println("bytesTotal:" + bytesTotal);
+                // System.out.println("speed:" + speed);
+                // }
+                // });
+                String url = "http://zhangmenshiting.baidu.com/data2/music/107086402/10706222072000128.mp3?xcode=8b0519936846f40ccdd20257df171faa9ce5af4687d9aaa6";
+                Volcano.newNetStack(Volcano.TYPE_HTTP_CLIENT, v.getContext()).makeRequest(Method.GET, null, url, null, null,
+                        new FileResponseHandler(Environment.getExternalStorageDirectory() + "/yyj", "好歌.mp3", true)
+                        {
 
-                    @Override
-                    protected void onFailure(int statusCode, Map<String, String> headers, byte[] responseBody, Throwable error)
-                    {
-                        error.printStackTrace();
-                    }
+                            @Override
+                            public void onSuccess(int statusCode, Map<String, String> headers, File file)
+                            {
+                                System.out.println(file.getName());
+                            }
 
-                    @Override
-                    public void onSuccess(int status, String content)
-                    {
-                        System.out.println(content);
-                    }
+                            @Override
+                            public void onFailure(int statusCode, Map<String, String> headers, Throwable e)
+                            {
+                                e.printStackTrace();
+                            }
 
-                    @Override
-                    public void onProgress(int bytesWritten, int bytesTotal, int speed)
-                    {
-                        System.out.println("bytesWritten:" + bytesWritten);
-                        System.out.println("bytesTotal:" + bytesTotal);
-                        System.out.println("speed:" + speed);
-                    }
-                });
+                            @Override
+                            public void onProgress(int bytesWritten, int bytesTotal, int speed)
+                            {
+                                System.out.println("bytesWritten:" + bytesWritten);
+                                System.out.println("bytesTotal:" + bytesTotal);
+                                System.out.println("speed:" + speed);
+                            }
+                        });
             }
         });
     }

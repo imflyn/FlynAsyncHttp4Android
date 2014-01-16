@@ -127,9 +127,7 @@ public class HttpUrlRequest extends Request
 
             cause = new IOException("Unhandled exception :" + e.getMessage());
         }
-
         throw (cause);
-
     }
 
     @Override
