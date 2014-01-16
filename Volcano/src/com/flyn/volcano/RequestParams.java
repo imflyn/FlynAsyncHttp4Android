@@ -7,20 +7,24 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 /**
- * The container for  request parameters   
+ * The container for request parameters
  * 
  * @author V
  * 
  */
-public abstract class RequestParams
+public  class RequestParams
 {
     protected ConcurrentHashMap<String, String>        urlParams;
     protected ConcurrentHashMap<String, FileWrapper>   fileParams;
@@ -35,7 +39,7 @@ public abstract class RequestParams
         if (encoding != null)
             this.contentEncoding = encoding;
         else
-            new NullPointerException("encoding is null ");
+            new NullPointerException("encoding is null.");
     }
 
     public RequestParams()
@@ -126,32 +130,6 @@ public abstract class RequestParams
         return format(this.urlParams, this.contentEncoding);
     }
 
-    public static class FileWrapper
-    {
-        public File   file;
-        public String contentType;
-
-        public FileWrapper(File file, String contentType)
-        {
-            this.file = file;
-            this.contentType = contentType;
-        }
-    }
-
-    public static class StreamWrapper
-    {
-        public InputStream inputStream;
-        public String      name;
-        public String      contentType;
-
-        public StreamWrapper(InputStream inputStream, String name, String contentType)
-        {
-            this.inputStream = inputStream;
-            this.name = name;
-            this.contentType = contentType;
-        }
-    }
-
     protected HttpEntity getEntity(IResponseHandler progressHandler) throws IOException
     {
         if (this.streamParams.isEmpty() && this.fileParams.isEmpty())
@@ -162,14 +140,54 @@ public abstract class RequestParams
             return createMultipartEntity(progressHandler);
         }
     }
+    
 
-    protected abstract HttpEntity createNormalEitity();
+    protected HttpEntity createNormalEitity()
+    {
+        List<BasicNameValuePair> lparams = new LinkedList<BasicNameValuePair>();
 
-    protected abstract HttpEntity createMultipartEntity(IResponseHandler progressHandler) throws IOException;
+        for (ConcurrentHashMap.Entry<String, String> entry : this.urlParams.entrySet())
+        {
+            lparams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        }
+
+        try
+        {
+            return new UrlEncodedFormEntity(lparams, this.contentEncoding);
+        } catch (UnsupportedEncodingException e)
+        {
+            return null;
+        }
+    }
+
+    protected HttpEntity createMultipartEntity(IResponseHandler progressHandler) throws IOException
+    {
+        MultipartEntity entity = new MultipartEntity(progressHandler);
+        entity.setIsRepeatable(this.isRepeatable);
+
+        for (ConcurrentHashMap.Entry<String, String> entry : this.urlParams.entrySet())
+        {
+            entity.addPart(entry.getKey(), entry.getValue());
+        }
+
+        for (ConcurrentHashMap.Entry<String, StreamWrapper> entry : this.streamParams.entrySet())
+        {
+            StreamWrapper stream = entry.getValue();
+            if (stream.inputStream != null)
+            {
+                entity.addPart(entry.getKey(), stream.name, stream.inputStream, stream.contentType);
+            }
+        }
+
+        for (ConcurrentHashMap.Entry<String, FileWrapper> entry : this.fileParams.entrySet())
+        {
+            FileWrapper fileWrapper = entry.getValue();
+            entity.addPart(entry.getKey(), fileWrapper.file, fileWrapper.contentType);
+        }
+        return entity;
+    }
 
     /**
-     * 通过集合获取URL
-     * 
      * @param parameters
      * @param encoding
      * @return
@@ -201,6 +219,49 @@ public abstract class RequestParams
         } catch (UnsupportedEncodingException problem)
         {
             throw new IllegalArgumentException(problem);
+        }
+    }
+    
+    protected final ConcurrentHashMap<String, String> getUrlParams()
+    {
+        return this.urlParams;
+    }
+
+    protected final ConcurrentHashMap<String, FileWrapper> getFileParams()
+    {
+        return this.fileParams;
+    }
+
+    protected final ConcurrentHashMap<String, StreamWrapper> getStreamParams()
+    {
+        return this.streamParams;
+    }
+
+
+
+    public static class FileWrapper
+    {
+        public File   file;
+        public String contentType;
+
+        public FileWrapper(File file, String contentType)
+        {
+            this.file = file;
+            this.contentType = contentType;
+        }
+    }
+
+    public static class StreamWrapper
+    {
+        public InputStream inputStream;
+        public String      name;
+        public String      contentType;
+
+        public StreamWrapper(InputStream inputStream, String name, String contentType)
+        {
+            this.inputStream = inputStream;
+            this.name = name;
+            this.contentType = contentType;
         }
     }
 

@@ -10,7 +10,8 @@ public class HttpUrlRequest extends Request
 {
     private final HttpURLConnection connect;
     private final RequestParams     requestParams;
-
+    
+    
     public HttpUrlRequest(HttpURLConnection connect, RequestParams requestParams, IResponseHandler responseHandler)
     {
         super(responseHandler);
@@ -23,6 +24,10 @@ public class HttpUrlRequest extends Request
     {
         if (isCancelled())
             return;
+        
+        this.requestParams.getFileParams();
+        
+        
         // if (this.request.getURI().getScheme() == null)
         // throw new MalformedURLException("No valid URI scheme was provided.");
         //
@@ -90,11 +95,6 @@ public class HttpUrlRequest extends Request
     public boolean cancel(boolean mayInterruptIfRunning)
     {
         this.isCancelled = true;
-        // if (mayInterruptIfRunning && this.request != null &&
-        // !this.request.isAborted())
-        // {
-        // this.request.abort();
-        // }
         return isCancelled();
     }
 

@@ -5,12 +5,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -23,7 +25,12 @@ public class HttpUrlSSLSocketFactory extends SSLSocketFactory
     public HttpUrlSSLSocketFactory() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException
     {
         super();
-        this.sslContext.init(null, new TrustManager[] { new X509TrustManager()
+        KeyStore keyStore = Utils.getKeystore();
+        String algorithm = KeyManagerFactory.getDefaultAlgorithm();
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+        kmf.init(keyStore, null);
+
+        this.sslContext.init(kmf.getKeyManagers(), new TrustManager[] { new X509TrustManager()
         {
 
             @Override

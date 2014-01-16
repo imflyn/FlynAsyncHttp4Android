@@ -35,6 +35,7 @@ public class HttpUrlStack extends NetStack
     private Proxy               proxy;
     private String              userAgent;
     private String              basicAuth;
+    private boolean             isAccpetCookies   = true;
 
     public HttpUrlStack(Context context)
     {
@@ -81,7 +82,9 @@ public class HttpUrlStack extends NetStack
         connection.setReadTimeout(this.timeout);
         connection.setUseCaches(false);
         connection.setDoInput(true);
-
+        connection.setRequestProperty("Connection", "Keep-Alive");  
+        if (this.isAccpetCookies)
+            connection.setRequestProperty("Cookie", getCookies(parsedUrl));
         if (Utils.CMMAP_Request(this.context))
             connection.addRequestProperty("X-Online-Host", parsedUrl);
         if (!TextUtils.isEmpty(this.userAgent))
@@ -103,8 +106,6 @@ public class HttpUrlStack extends NetStack
 
             ((HttpsURLConnection) connection).setSSLSocketFactory(this.mSslSocketFactory);
         }
-
-        // Cookies
 
         return connection;
     }
@@ -148,29 +149,38 @@ public class HttpUrlStack extends NetStack
     @Override
     public RequestFuture makeRequest(int method, String contentType, String url, Map<String, String> headers, RequestParams params, IResponseHandler responseHandler)
     {
-        HttpURLConnection urlConnection = openConnection(url, responseHandler);
+        HttpURLConnection urlConnection =null;
+        String requestMethod="GET";
+        String normalUrl=url;
         try
         {
             switch (method)
             {
                 case Method.GET:
-                    urlConnection.setRequestMethod("GET");
+                    requestMethod="GET";
+                    normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
                     break;
                 case Method.POST:
-                    urlConnection.setRequestMethod("POST");
+                    requestMethod="POST";
+                    normalUrl=params.getParamString();
                     break;
                 case Method.PUT:
-                    urlConnection.setRequestMethod("PUT");
+                    requestMethod="PUT";
+                    normalUrl=params.getParamString();
                     break;
                 case Method.DELETE:
-                    urlConnection.setRequestMethod("DELETE");
+                    requestMethod="DELETE";
+                    normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
                     break;
                 case Method.HEAD:
-                    urlConnection.setRequestMethod("HEAD");
+                    requestMethod="HEAD";
+                    normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
                     break;
                 default:
                     throw new IllegalStateException("Unknown request method.");
             }
+            urlConnection= openConnection(normalUrl, responseHandler);
+            urlConnection.setRequestMethod(requestMethod);
         } catch (ProtocolException e)
         {
             if (responseHandler != null)
@@ -181,7 +191,7 @@ public class HttpUrlStack extends NetStack
 
         addHeaders(urlConnection, headers);
         // responseHandler.setRequestHeaders(headers);
-        
+
         return sendRequest(contentType, responseHandler, prepareArguments(urlConnection, params));
     }
 
@@ -232,15 +242,15 @@ public class HttpUrlStack extends NetStack
     @Override
     public void setProxy(String host, int port)
     {
-        if(!TextUtils.isEmpty(host)&&port>0)
-        this.proxy = new Proxy(Type.HTTP, new InetSocketAddress(host, port));
+        if (!TextUtils.isEmpty(host) && port > 0)
+            this.proxy = new Proxy(Type.HTTP, new InetSocketAddress(host, port));
     }
 
     @Override
     public void setProxy(String host, int port, String username, String password)
     {
-        if(!TextUtils.isEmpty(host)&&port>0)
-        this.proxy = new Proxy(Type.HTTP, new InetSocketAddress(host, port));
+        if (!TextUtils.isEmpty(host) && port > 0)
+            this.proxy = new Proxy(Type.HTTP, new InetSocketAddress(host, port));
         Properties propRet = null;
         if (!TextUtils.isEmpty(host))
         {
@@ -255,9 +265,6 @@ public class HttpUrlStack extends NetStack
         }
     }
 
-    public void setMaxRetriesAndTimeout(int retries, int timeout)
-    {
-    }
 
     public void setBasicAuth(String username, String password)
     {
@@ -268,6 +275,18 @@ public class HttpUrlStack extends NetStack
     public void clearBasicAuth()
     {
         this.basicAuth = null;
+    }
+
+    public void setAcceptCookie(boolean accept)
+    {
+        this.isAccpetCookies = accept;
+    }
+
+    public String getCookies(String url)
+    {
+        if (!this.isAccpetCookies || url == null)
+            return null;
+        return CookieManager.getInstance().getCookie(url);
     }
 
 }

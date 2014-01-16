@@ -290,6 +290,7 @@ public class HttpClientStack extends NetStack
 
     /**
      * Set it befor request started
+     * 
      * @param threadPool
      */
     public void setThreadPool(ThreadPoolExecutor threadPool)
@@ -375,12 +376,12 @@ public class HttpClientStack extends NetStack
         AuthScope scope = AuthScope.ANY;
         setBasicAuth(username, password, scope);
     }
-    
+
     public void clearBasicAuth()
     {
         this.httpClient.getCredentialsProvider().clear();
     }
-    
+
     private HttpEntity paramsToEntity(RequestParams params, IResponseHandler responseHandler)
     {
         HttpEntity entity = null;
@@ -388,8 +389,7 @@ public class HttpClientStack extends NetStack
         {
             if (params != null)
             {
-                if (params instanceof HttpClientRequestParams)
-                    entity = ((HttpClientRequestParams) params).getEntity(responseHandler);
+                entity = params.getEntity(responseHandler);
             }
         } catch (Throwable t)
         {
@@ -400,7 +400,6 @@ public class HttpClientStack extends NetStack
         }
         return entity;
     }
-
 
     static class InflatingEntity extends HttpEntityWrapper
     {

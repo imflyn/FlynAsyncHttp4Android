@@ -35,7 +35,7 @@ public abstract class NetStack
     public NetStack(Context context)
     {
         if (context == null)
-            throw new IllegalArgumentException("Context can not be null");
+            throw new IllegalArgumentException("Context can not be null.");
         this.threadPool = Executors.newCachedThreadPool();
         this.requestMap = new WeakHashMap<Context, List<RequestFuture>>();
         this.httpHeaderMap = new HashMap<String, String>();

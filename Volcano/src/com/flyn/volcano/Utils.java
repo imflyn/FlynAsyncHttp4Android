@@ -1,7 +1,13 @@
 package com.flyn.volcano;
 
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.Map;
 
 import org.apache.http.impl.cookie.DateParseException;
@@ -113,5 +119,54 @@ public class Utils
         if (extraInfo.contains("CMWAP"))
             return true;
         return false;
+    }
+    
+    
+    public static KeyStore getKeystoreOfCA(InputStream cert)
+    {
+
+        // Load CAs from an InputStream
+        InputStream caInput = null;
+        Certificate ca = null;
+        try
+        {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            caInput = new BufferedInputStream(cert);
+            ca = cf.generateCertificate(caInput);
+        } catch (CertificateException e1)
+        {
+            e1.printStackTrace();
+        } finally
+        {
+            Utils.quickClose(caInput);
+        }
+
+        // Create a KeyStore containing our trusted CAs
+        String keyStoreType = KeyStore.getDefaultType();
+        KeyStore keyStore = null;
+        try
+        {
+            keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return keyStore;
+    }
+
+    public static KeyStore getKeystore()
+    {
+        KeyStore trustStore = null;
+        try
+        {
+            trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+        } catch (Throwable t)
+        {
+            t.printStackTrace();
+        }
+        return trustStore;
     }
 }
