@@ -164,8 +164,7 @@ public class HttpUrlStack extends NetStack
             {
                 case Method.GET:
                     requestMethod = "GET";
-                    // normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled,
-                    // url, params);
+                    normalUrl = Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
                     break;
                 case Method.POST:
                     requestMethod = "POST";
@@ -177,13 +176,11 @@ public class HttpUrlStack extends NetStack
                     break;
                 case Method.DELETE:
                     requestMethod = "DELETE";
-                    // normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled,
-                    // url, params);
+                    normalUrl = Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
                     break;
                 case Method.HEAD:
                     requestMethod = "HEAD";
-                    // normalUrl=Utils.getUrlWithParams(this.isURLEncodingEnabled,
-                    // url, params);
+                    normalUrl = Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params);
                     break;
                 default:
                     throw new IllegalStateException("Unknown request method.");
