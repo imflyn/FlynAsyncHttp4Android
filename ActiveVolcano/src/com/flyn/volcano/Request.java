@@ -2,11 +2,14 @@ package com.flyn.volcano;
 
 import java.util.Map;
 
-public abstract class Request<T>
+public abstract class Request<T> implements Comparable<Request<T>>
 {
     private final String        url;
     private final RequestParams requestPramas;
     private final int           method;
+    private Integer             sequence;
+    private boolean             mCanceled = false;
+    private Object              tag;
 
     public Request(int method, String url, RequestParams requestPramas)
     {
@@ -34,7 +37,41 @@ public abstract class Request<T>
 
     public Map<String, String> getHeaders()
     {
-        return this.requestPramas.getUrlParams();
+        return requestPramas.getUrlParams();
+    }
+
+    public final void setSequence(int sequence)
+    {
+        this.sequence = sequence;
+    }
+
+    public final int getSequence()
+    {
+        if (sequence == null)
+        {
+            throw new IllegalStateException("getSequence called before setSequence");
+        }
+        return sequence;
+    }
+
+    public void cancel()
+    {
+        mCanceled = true;
+    }
+
+    public boolean isCanceled()
+    {
+        return mCanceled;
+    }
+
+    public final Object getTag()
+    {
+        return tag;
+    }
+
+    public final void setTag(Object tag)
+    {
+        this.tag = tag;
     }
 
     public interface Method
@@ -44,5 +81,11 @@ public abstract class Request<T>
         int PUT    = 2;
         int DELETE = 3;
         int HEAD   = 4;
+    }
+
+    @Override
+    public int compareTo(Request<T> another)
+    {
+        return this.sequence - another.sequence;
     }
 }

@@ -1,7 +1,13 @@
 package com.flyn.volcano;
 
+import android.os.Handler;
+
 public class ExecutorDelivery implements ResponseDelivery
 {
+
+    public ExecutorDelivery(Handler handler)
+    {
+    }
 
     @Override
     public void postResponse(Request<?> request, Response<?> response)

@@ -5,10 +5,17 @@ import java.util.concurrent.BlockingQueue;
 
 public class NetworkDispatcher extends Thread
 {
-    private Network                   mNetwork;
-    private ResponseDelivery          mDelivery;
-    private BlockingQueue<Request<?>> mQueue;
-    private volatile boolean          mQuit = false;
+    private final Network                   mNetwork;
+    private final ResponseDelivery          mDelivery;
+    private final BlockingQueue<Request<?>> mQueue;
+    private volatile boolean                mQuit = false;
+
+    public NetworkDispatcher(BlockingQueue<Request<?>> queue, Network network, ResponseDelivery delivery)
+    {
+        this.mQueue = queue;
+        this.mNetwork = network;
+        this.mDelivery = delivery;
+    }
 
     @Override
     public void run()
@@ -37,5 +44,10 @@ public class NetworkDispatcher extends Thread
 
         mDelivery.postResponse(request, response);
 
+    }
+    
+    public void quit()
+    {
+        
     }
 }
