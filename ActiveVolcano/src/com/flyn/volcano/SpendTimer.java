@@ -5,25 +5,27 @@ import java.util.TimerTask;
 
 public class SpendTimer
 {
-    private final static int DEFAULT_TIMER_DURATION=1500;
-    private final static int DEFAULT_START_TIMER_DELAY=200;
-    private int                bytesTotal    = 0;
-    private int                bytesWritten  = 0;
+    private final static int    DEFAULT_TIMER_DURATION    = 1500;
+    private final static int    DEFAULT_START_TIMER_DELAY = 200;
+
+    private final TimerListener timerListener;
+    private int                 bytesTotal                = 0;
+    private int                 bytesWritten              = 0;
 
     private Timer               timer;
-    private boolean             isScheduleing = true;
-    private long                timeStamp     = 0;
-    private long                sizeStamp     = 0;
-    private int                 currentSpeed  = 0;
-    
-    private final TimerListener timerListener;
-    
-    protected SpendTimer(TimerListener timerListener)
+    private boolean             isScheduleing             = true;
+    private long                timeStamp                 = 0;
+    private long                sizeStamp                 = 0;
+    private int                 currentSpeed              = 0;
+
+    protected SpendTimer(int bytesTotal, int bytesWritten, TimerListener timerListener)
     {
-        this.timerListener=timerListener;
+        this.timerListener = timerListener;
+        this.bytesTotal = bytesTotal;
+        this.bytesWritten = bytesWritten;
     }
-    
-    private void updateProgress(int count)
+
+    protected void updateProgress(int count)
     {
         this.bytesWritten += count;
     }
@@ -53,11 +55,10 @@ public class SpendTimer
                         currentSpeed = (int) ((getSize / spendTime) / 1.024);
 
                     if (!first)
-                      timerListener.onProgress(bytesWritten, bytesTotal, currentSpeed);
+                        timerListener.onProgress(bytesWritten, bytesTotal, currentSpeed);
                     else
                         first = false;
-                    
-                    
+
                 } else
                 {
                     stopTimer();
@@ -76,11 +77,10 @@ public class SpendTimer
             this.timer = null;
         }
     }
-    
-    
+
     interface TimerListener
     {
         void onProgress(int bytesWritten, int bytesTotal, int speed);
-        
+
     }
 }
