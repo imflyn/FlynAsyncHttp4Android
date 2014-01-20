@@ -24,7 +24,7 @@ public class NetworkDispatcher extends Thread
         try
         {
 
-            request = mQueue.take();
+            request = this.mQueue.take();
 
         } catch (InterruptedException e1)
         {
@@ -34,7 +34,7 @@ public class NetworkDispatcher extends Thread
         NetworkResponse networkResponse = null;
         try
         {
-            networkResponse = mNetwork.executeRequest(request, mDelivery);
+            networkResponse = this.mNetwork.executeRequest(request, this.mDelivery);
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -42,7 +42,7 @@ public class NetworkDispatcher extends Thread
 
         Response<?> response = request.parseNetworkResponse(networkResponse);
 
-        mDelivery.postResponse(request, response);
+        this.mDelivery.postResponse(request, response);
 
     }
 

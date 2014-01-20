@@ -39,7 +39,7 @@ public class HttpUrlStack implements HttpStack
     private boolean                fixNoHttpResponseException = false;
     private boolean                isAccpetCookies            = true;
     private String                 mBasicAuth                 = null;
-    private String                 userAgent                  = null;
+    private String                 mUserAgent                  = null;
     private Proxy                  mProxy                     = null;
 
     public HttpUrlStack(Context context)
@@ -109,8 +109,8 @@ public class HttpUrlStack implements HttpStack
         if (Utils.CMMAP_Request(this.context))
             connection.addRequestProperty("X-Online-Host", parsedUrl);
 
-        if (!TextUtils.isEmpty(this.userAgent))
-            connection.setRequestProperty("User-Agent", this.userAgent);
+        if (!TextUtils.isEmpty(this.mUserAgent))
+            connection.setRequestProperty("User-Agent", this.mUserAgent);
         else
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 
@@ -242,7 +242,7 @@ public class HttpUrlStack implements HttpStack
     public void setUserAgent(String userAgent)
     {
         if (!TextUtils.isEmpty(userAgent))
-            this.userAgent = userAgent;
+            this.mUserAgent = userAgent;
     }
 
     public void setTimeOut(int timeout)
