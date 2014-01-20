@@ -34,8 +34,10 @@ public abstract class Request<T> implements Comparable<Request<T>>
         this.url = url;
         this.retryCount = retryCount;
     }
+    
+    protected abstract Response<?> parseNetworkResponse(NetworkResponse response, final ResponseDelivery responseDelivery) throws IOException;
 
-    protected byte[] parseNetworkResponse(NetworkResponse response, final ResponseDelivery responseDelivery) throws IOException
+    protected byte[] getData(NetworkResponse response, final ResponseDelivery responseDelivery) throws IOException
     {
         byte[] responseData = new byte[0];
         HttpEntity entity = response.getEntity();
@@ -54,7 +56,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
 
             ByteArrayPool mPool = new ByteArrayPool(4096);
             PoolingByteArrayOutputStream bytes = new PoolingByteArrayOutputStream(mPool, (int) contentLength);
-            byte[] buffer = null;
+            byte[] buffer = mPool.getBuf(1024);
             SpendTimer timer = new SpendTimer((int) contentLength, new TimerListener()
             {
 
@@ -68,7 +70,6 @@ public abstract class Request<T> implements Comparable<Request<T>>
             try
             {
                 timer.start();
-                buffer = mPool.getBuf(1024);
                 int count;
                 while (!isCanceled() && (count = inStream.read(buffer)) != -1 && !Thread.currentThread().isInterrupted())
                 {
@@ -91,8 +92,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
                 {
                     // 释放http连接所占用的资源
                     entity.consumeContent();
-                    if (null != buffer)
-                        mPool.returnBuf(buffer);
+                    mPool.returnBuf(buffer);
                 } catch (IOException e)
                 {
                     Log.e(Request.class.getName(), "Error occured when calling consumingContent", e);
@@ -103,8 +103,6 @@ public abstract class Request<T> implements Comparable<Request<T>>
         return responseData;
 
     }
-
-    abstract protected Response<?> getData(byte[] data);
 
     abstract protected void deliverResponse(T response);
 

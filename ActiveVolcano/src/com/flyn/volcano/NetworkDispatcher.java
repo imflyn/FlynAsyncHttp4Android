@@ -56,7 +56,7 @@ public class NetworkDispatcher extends Thread
                         continue;
                     }
 
-                    Response<?> response=request.getData( request.parseNetworkResponse(networkResponse,this.mDelivery));
+                    Response<?> response = request.parseNetworkResponse(networkResponse, this.mDelivery);
                     request.markDelivered();
                     request.finish();
                     this.mDelivery.sendSuccessMessage(request, response);

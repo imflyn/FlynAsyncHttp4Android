@@ -1,39 +1,41 @@
 package com.flyn.volcano;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class StringRequest extends Request<String>
 {
     private final Listener<String> mListener;
-    
-    public StringRequest(int method, String url, RequestParams requestPramas,Listener<String> mListener)
+
+    public StringRequest(int method, String url, RequestParams requestPramas, Listener<String> mListener)
     {
         super(method, url, requestPramas);
-        this.mListener=mListener;
-    }
-   
-    public StringRequest(int method, String url, RequestParams requestPramas, int retryCount,Listener<String> mListener)
-    {
-        super(method, url, requestPramas, retryCount);
-        this.mListener=mListener;
+        this.mListener = mListener;
     }
 
-    public StringRequest(String url, RequestParams requestPramas, int retryCount,Listener<String> mListener)
+    public StringRequest(int method, String url, RequestParams requestPramas, int retryCount, Listener<String> mListener)
+    {
+        super(method, url, requestPramas, retryCount);
+        this.mListener = mListener;
+    }
+
+    public StringRequest(String url, RequestParams requestPramas, int retryCount, Listener<String> mListener)
     {
         super(Method.GET, url, requestPramas, retryCount);
-        this.mListener=mListener;
+        this.mListener = mListener;
     }
-    
 
     @Override
     protected void deliverResponse(String response)
     {
-//        this.mListener.onResponse(response);
+        // this.mListener.onResponse(response);
     }
 
     @Override
-    protected Response<String> getData(byte[] data)
+    protected Response<?> parseNetworkResponse(NetworkResponse response, ResponseDelivery responseDelivery) throws IOException
     {
+        byte[] data = getData(response, responseDelivery);
+
         String result;
         try
         {
@@ -44,6 +46,5 @@ public class StringRequest extends Request<String>
         }
         return Response.build(result);
     }
-
 
 }
