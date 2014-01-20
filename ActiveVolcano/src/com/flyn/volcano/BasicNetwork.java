@@ -15,7 +15,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 
 public class BasicNetwork implements Network
 {
-    private static int          DEFAULT_POOL_SIZE = 4096;
+    private final static  int          DEFAULT_POOL_SIZE = 4096;
 
     private final HttpStack     mHttpStack;
     private final ByteArrayPool mPool;
