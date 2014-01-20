@@ -99,8 +99,8 @@ public class Utils
         }
         if (null != params)
         {
-//            String paramString = params.getUrlParams();
-            String paramString ="";
+            // String paramString = params.getUrlParams();
+            String paramString = "";
             if (!url.contains("?"))
             {
                 url += "?" + paramString;

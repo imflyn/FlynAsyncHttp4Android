@@ -12,11 +12,11 @@ public class ExecutorDelivery implements ResponseDelivery
     @Override
     public void postResponse(Request<?> request, Response<?> response, Runnable runnable)
     {
-                
+
     }
 
     @Override
-    public void postError(Request<?> request, VolcanoError error)
+    public void postError(Request<?> request, Exception error)
     {
 
     }

@@ -1,5 +1,6 @@
 package com.flyn.volcano;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 public class NetworkDispatcher extends Thread
@@ -23,10 +24,17 @@ public class NetworkDispatcher extends Thread
             e1.printStackTrace();
         }
 
-        NetworkResponse networkResponse = mNetwork.executeRequest(request);
+        NetworkResponse networkResponse = null;
+        try
+        {
+            networkResponse = mNetwork.executeRequest(request, mDelivery);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
 
         Response<?> response = request.parseNetworkResponse(networkResponse);
-        
+
         mDelivery.postResponse(request, response);
 
     }

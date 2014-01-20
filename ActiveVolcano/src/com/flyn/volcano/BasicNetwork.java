@@ -1,5 +1,6 @@
 package com.flyn.volcano;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
@@ -14,13 +15,13 @@ public class BasicNetwork implements Network
     }
 
     @Override
-    public NetworkResponse executeRequest(Request<?> request)
+    public NetworkResponse executeRequest(Request<?> request, ResponseDelivery responseDelivery) throws IOException
     {
         HttpResponse httpResponse;
 
         Map<String, String> headers = request.getHeaders();
 
-        httpResponse = mHttpStack.performRequest(request);
+        httpResponse = mHttpStack.performRequest(request, responseDelivery);
 
         int httpStatusCode = 0;
 

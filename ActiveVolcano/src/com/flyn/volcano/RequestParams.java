@@ -70,18 +70,17 @@ public class RequestParams
     {
         this.mStreamParams.put(key, new StreamWrapper(value, contentType));
     }
-    
+
     public void remove(String key)
     {
         this.mUrlParams.remove(key);
         this.mFileParams.remove(key);
         this.mStreamParams.remove(key);
     }
-    
-    
+
     protected final Map<String, String> getUrlParams()
     {
-        HashMap<String, String> map=new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.putAll(this.mUrlParams);
         return map;
     }
