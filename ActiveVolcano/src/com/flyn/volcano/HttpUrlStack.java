@@ -72,7 +72,7 @@ public class HttpUrlStack implements HttpStack
 
         HttpURLConnection connection = openConnection(url, request);
         addHeaders(headerMap, connection);
-        setParams(request, connection);
+        setParams(request, connection, responseDelivery);
 
         return null;
     }
@@ -103,10 +103,13 @@ public class HttpUrlStack implements HttpStack
         connection.setDoInput(true);
         connection.setRequestProperty("Charsert", HTTP.UTF_8);
         connection.setRequestProperty("Connection", "Keep-Alive");
+        
         if (this.isAccpetCookies)
             connection.setRequestProperty("Cookie", getCookies(parsedUrl));
+        
         if (Utils.CMMAP_Request(this.context))
             connection.addRequestProperty("X-Online-Host", parsedUrl);
+        
         if (!TextUtils.isEmpty(this.userAgent))
             connection.setRequestProperty("User-Agent", this.userAgent);
         else
@@ -130,7 +133,6 @@ public class HttpUrlStack implements HttpStack
                 else
                     sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             }
-
             ((HttpsURLConnection) connection).setSSLSocketFactory(sslSocketFactory);
         }
 
@@ -145,7 +147,7 @@ public class HttpUrlStack implements HttpStack
         }
     }
 
-    private void setParams(Request<?> request, HttpURLConnection connection) throws ProtocolException
+    private void setParams(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery) throws ProtocolException
     {
         switch (request.getMethod())
         {
@@ -160,20 +162,28 @@ public class HttpUrlStack implements HttpStack
                 break;
             case Method.POST:
                 connection.setRequestMethod("POST");
-                uploadIfNeeded(request, connection);
+                uploadIfNeeded(request, connection, responseDelivery);
                 break;
             case Method.PUT:
                 connection.setRequestMethod("PUT");
-                uploadIfNeeded(request, connection);
+                uploadIfNeeded(request, connection, responseDelivery);
                 break;
             default:
                 throw new IllegalStateException("Unknown method type.");
         }
     }
 
-    private void uploadIfNeeded(Request<?> request, HttpURLConnection connection)
+    private void uploadIfNeeded(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery)
     {
-
+//        byte[] body = request.getBody();
+//        if (body != null)
+//        {
+//            connection.setDoOutput(true);
+//            connection.addRequestProperty(HEADER_CONTENT_TYPE, request.getBodyContentType());
+//            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+//            out.write(body);
+//            out.close();
+//        }      
     }
 
     public void setProxy(String host, int port)
