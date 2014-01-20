@@ -1,14 +1,11 @@
 package com.flyn.volcano;
 
-import org.apache.http.HttpResponse;
-
 public interface Listener
 {
-    void sendResponseMessage(HttpResponse response) ;
 
-    void sendStart();
+    void onStart();
 
-    void sendFinish();
+    void onFinish();
 
     void onProgress(int bytesWritten, int bytesTotal, int currentSpeed);
 
