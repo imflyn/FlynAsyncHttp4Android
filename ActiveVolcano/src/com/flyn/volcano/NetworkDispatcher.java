@@ -26,7 +26,7 @@ public class NetworkDispatcher extends Thread
         NetworkResponse networkResponse = mNetwork.executeRequest(request);
 
         Response<?> response = request.parseNetworkResponse(networkResponse);
-
+        
         mDelivery.postResponse(request, response);
 
     }
