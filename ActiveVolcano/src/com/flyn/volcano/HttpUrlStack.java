@@ -7,7 +7,7 @@ import org.apache.http.HttpResponse;
 
 public class HttpUrlStack implements HttpStack
 {
-    
+
     @Override
     public HttpResponse performRequest(Request<?> request, Map<String, String> additionalHeaders) throws IOException
     {

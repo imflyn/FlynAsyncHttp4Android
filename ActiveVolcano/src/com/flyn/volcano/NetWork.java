@@ -1,10 +1,7 @@
 package com.flyn.volcano;
 
-
-public interface NetWork  
+public interface NetWork
 {
-    void executeRequest(Request<?> request) throws VolcanoError ;
-    
-    
-    
+    void executeRequest(Request<?> request) throws VolcanoError;
+
 }
