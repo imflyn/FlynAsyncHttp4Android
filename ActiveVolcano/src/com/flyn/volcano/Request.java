@@ -12,6 +12,8 @@ import com.flyn.volcano.SpendTimer.TimerListener;
 
 public abstract class Request<T> implements Comparable<Request<T>>
 {
+    protected static final int DEFAULT_RETRY_COUNT=1;
+    
     private final String        url;
     private final RequestParams requestPramas;
     private final int           method;
@@ -24,7 +26,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
 
     public Request(int method, String url, RequestParams requestPramas)
     {
-        this(method, url, requestPramas, 1);
+        this(method, url, requestPramas, DEFAULT_RETRY_COUNT);
     }
 
     public Request(int method, String url, RequestParams requestPramas, int retryCount)
