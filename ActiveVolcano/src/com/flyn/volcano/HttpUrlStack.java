@@ -6,7 +6,7 @@ public class HttpUrlStack implements HttpStack
 {
 
     @Override
-    public HttpResponse performRequest(Request<?> request) 
+    public HttpResponse performRequest(Request<?> request)
     {
         return null;
     }

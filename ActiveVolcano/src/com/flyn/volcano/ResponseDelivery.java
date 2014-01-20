@@ -1,6 +1,5 @@
 package com.flyn.volcano;
 
-
 public interface ResponseDelivery
 {
     public void postResponse(Request<?> request, Response<?> response);

@@ -17,9 +17,8 @@ public abstract class Request<T>
     {
         this.requestPramas = requestPramas;
     }
-    
-    
-    public Map<String,String> getHeaders()
+
+    public Map<String, String> getHeaders()
     {
         return null;
     }

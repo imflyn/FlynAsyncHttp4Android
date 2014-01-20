@@ -1,11 +1,9 @@
 package com.flyn.volcano;
 
-
-
 public class RequestQueue
 {
-    private NetworkDispatcher[]                  mDispatchers;
-    
+    private NetworkDispatcher[] mDispatchers;
+
     protected RequestQueue(Network netWork)
     {
 
@@ -20,27 +18,25 @@ public class RequestQueue
             networkDispatcher.start();
         }
     }
-    
+
     public void stop()
     {
-        
+
     }
-    
+
     public void cancelAll()
     {
-        
+
     }
-    
+
     public Request<?> add(Request<?> request)
     {
         return null;
     }
-    
+
     public void finish()
     {
-        
+
     }
-    
-    
-    
+
 }

@@ -15,9 +15,9 @@ public class NetworkDispatcher extends Thread
         Request<?> request = null;
         try
         {
-        
+
             request = mQueue.take();
-        
+
         } catch (InterruptedException e1)
         {
             e1.printStackTrace();
