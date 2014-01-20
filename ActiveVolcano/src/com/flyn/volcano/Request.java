@@ -2,24 +2,33 @@ package com.flyn.volcano;
 
 import java.util.Map;
 
+
 public abstract class Request<T>
 {
-    private RequestPramas requestPramas;
+    private final String        url;
+    private final RequestParams requestPramas;
+
+    public Request(String url, RequestParams requestPramas)
+    {
+        this.requestPramas = requestPramas;
+        this.url = url;
+    }
 
     abstract protected Response<T> parseNetworkResponse(NetworkResponse response);
 
-    public final RequestPramas getRequestPramas()
+    public final String getUrl()
+    {
+        return url;
+    }
+
+    public final RequestParams getRequestPramas()
     {
         return requestPramas;
     }
-
-    public final void setRequestPramas(RequestPramas requestPramas)
+    
+    public Map<String,String> getHeaders()
     {
-        this.requestPramas = requestPramas;
+        return this.requestPramas.getUrlParams();
     }
 
-    public Map<String, String> getHeaders()
-    {
-        return null;
-    }
 }
