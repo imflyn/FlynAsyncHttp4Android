@@ -1,12 +1,16 @@
 package com.flyn.volcano;
 
-public class BasicNetwork implements NetWork
+public class BasicNetwork implements Network
 {
-
+    
     @Override
-    public void executeRequest(Request<?> request) throws VolcanoError
+    public NetworkResponse executeRequest(Request<?> request) 
     {
-
+        
+        
+        
+        return null;
     }
+
 
 }

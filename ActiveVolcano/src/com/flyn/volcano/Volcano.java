@@ -7,7 +7,7 @@ public class Volcano
 
     public static RequestQueue newRequestQueue(Context context, HttpStack httpStack)
     {
-        NetWork netWork = new BasicNetwork();
+        Network netWork = new BasicNetwork();
         RequestQueue requestQueue = new RequestQueue(netWork);
         requestQueue.start();
         return requestQueue;

@@ -1,6 +1,6 @@
 package com.flyn.volcano;
 
-public class Response<T>
+public class NetworkResponse
 {
 
 }
