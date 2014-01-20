@@ -104,24 +104,23 @@ public class HttpUrlStack implements HttpStack
                 String value = header.getValue().get(0);
                 Header h = new BasicHeader(key, value);
                 response.addHeader(h);
-            }
-        }
 
-        Map<String, List<String>> headerFields = connection.getHeaderFields();
-        if (headerFields != null)
-        {
-            List<String> cookies = headerFields.get("Set-Cookie");
-            if (cookies != null)
-            {
-                CookieManager cookieManager = CookieManager.getInstance();
-                for (String cookie : cookies)
+                // addCookies
+                if (key.equalsIgnoreCase("Set-Cookie"))
                 {
-                    if (cookie == null)
-                        continue;
-                    cookieManager.setCookie(connection.getURL().toString(), cookie);
+                    if (value != null)
+                    {
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        for (String cookie : header.getValue())
+                        {
+                            if (cookie == null)
+                                continue;
+                            cookieManager.setCookie(connection.getURL().toString(), cookie);
+                        }
+                        if (Build.VERSION.SDK_INT >= 14)
+                            CookieSyncManager.getInstance().sync();
+                    }
                 }
-                if (Build.VERSION.SDK_INT >= 14)
-                    CookieSyncManager.getInstance().sync();
             }
         }
 

@@ -3,31 +3,32 @@ package com.flyn.volcano;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 
 public class NetworkResponse
 {
     private final int                 statueCode;
-    private final byte[]              data;
+    private final HttpEntity          httpEntity;
     private final boolean             notModified;
     private final Map<String, String> headers;
 
-    protected NetworkResponse(int statueCode, byte[] data, Map<String, String> headers, boolean notModified)
+    protected NetworkResponse(int statueCode, HttpEntity httpEntity, Map<String, String> headers, boolean notModified)
     {
         this.statueCode = statueCode;
-        this.data = data;
+        this.httpEntity = httpEntity;
         this.notModified = notModified;
         this.headers = headers;
     }
 
-    protected NetworkResponse(byte[] data)
+    protected NetworkResponse(HttpEntity httpEntity)
     {
-        this(HttpStatus.SC_OK, data, Collections.<String, String> emptyMap(), false);
+        this(HttpStatus.SC_OK, httpEntity, Collections.<String, String> emptyMap(), false);
     }
 
-    protected NetworkResponse(byte[] data, Map<String, String> headers)
+    protected NetworkResponse(HttpEntity httpEntity, Map<String, String> headers)
     {
-        this(HttpStatus.SC_OK, data, headers, false);
+        this(HttpStatus.SC_OK, httpEntity, headers, false);
     }
 
     protected final int getStatueCode()
@@ -35,9 +36,9 @@ public class NetworkResponse
         return statueCode;
     }
 
-    protected final byte[] getData()
+    protected final HttpEntity getEntity()
     {
-        return data;
+        return httpEntity;
     }
 
     protected final boolean isNotModified()

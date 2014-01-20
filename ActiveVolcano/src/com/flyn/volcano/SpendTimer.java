@@ -18,11 +18,17 @@ public class SpendTimer
     private long                sizeStamp                 = 0;
     private int                 currentSpeed              = 0;
 
-    protected SpendTimer(int bytesTotal, int bytesWritten, TimerListener timerListener)
+    protected SpendTimer(int bytesTotal, TimerListener timerListener)
     {
+        if (timerListener == null)
+            throw new IllegalStateException("TimerListener can' be null.");
+        
+
+        if (bytesTotal <= 0)
+            throw new IllegalStateException("BytesTotal must greater than zero.");
+        
         this.timerListener = timerListener;
         this.bytesTotal = bytesTotal;
-        this.bytesWritten = bytesWritten;
     }
 
     protected void updateProgress(int count)
@@ -30,7 +36,7 @@ public class SpendTimer
         this.bytesWritten += count;
     }
 
-    protected void startTimer()
+    protected void start()
     {
         if (null == this.timer)
             this.timer = new Timer();
@@ -61,14 +67,15 @@ public class SpendTimer
 
                 } else
                 {
-                    stopTimer();
+                    stop();
                 }
             }
         };
         this.timer.schedule(task, DEFAULT_START_TIMER_DELAY, DEFAULT_TIMER_DURATION);
     }
+    
 
-    protected void stopTimer()
+    protected void stop()
     {
         this.isScheduleing = false;
         if (this.timer != null)
