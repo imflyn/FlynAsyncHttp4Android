@@ -88,6 +88,7 @@ public class RequestQueue
         {
             this.mCurrentRequests.add(request);
         }
+        request.setRequestQueue(this);
         request.setSequence(getSequenceNumber());
         this.mNetworkQueue.add(request);
 

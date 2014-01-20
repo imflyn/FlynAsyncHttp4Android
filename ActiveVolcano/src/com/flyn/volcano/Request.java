@@ -7,15 +7,24 @@ public abstract class Request<T> implements Comparable<Request<T>>
     private final String        url;
     private final RequestParams requestPramas;
     private final int           method;
-    private Integer             sequence;
+    private final int           retryCount;
+    private boolean             mResponseDelivered;
     private boolean             mCanceled = false;
+    private Integer             sequence;
     private Object              tag;
+    private RequestQueue        mRequestQueue;
 
     public Request(int method, String url, RequestParams requestPramas)
+    {
+        this(method, url, requestPramas, 1);
+    }
+
+    public Request(int method, String url, RequestParams requestPramas, int retryCount)
     {
         this.method = method;
         this.requestPramas = requestPramas;
         this.url = url;
+        this.retryCount = retryCount;
     }
 
     abstract protected Response<T> parseNetworkResponse(NetworkResponse response);
@@ -35,7 +44,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
         return requestPramas;
     }
 
-    public Map<String, String> getHeaders()
+    public final Map<String, String> getHeaders()
     {
         return requestPramas.getUrlParams();
     }
@@ -72,6 +81,39 @@ public abstract class Request<T> implements Comparable<Request<T>>
     public final void setTag(Object tag)
     {
         this.tag = tag;
+    }
+
+    public final int getRetryCount()
+    {
+        return retryCount;
+    }
+
+    protected void markDelivered()
+    {
+        this.mResponseDelivered = true;
+    }
+
+    protected boolean hasHadResponseDelivered()
+    {
+        return this.mResponseDelivered;
+    }
+
+    protected final RequestQueue getRequestQueue()
+    {
+        return mRequestQueue;
+    }
+
+    protected final void setRequestQueue(RequestQueue requestQueue)
+    {
+        this.mRequestQueue = requestQueue;
+    }
+
+    void finish()
+    {
+        if (this.mRequestQueue != null)
+        {
+            this.mRequestQueue.finish(this);
+        }
     }
 
     public interface Method

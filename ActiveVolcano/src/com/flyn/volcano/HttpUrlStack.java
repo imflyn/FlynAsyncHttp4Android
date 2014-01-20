@@ -1,6 +1,7 @@
 package com.flyn.volcano;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.ProtocolException;
@@ -8,16 +9,27 @@ import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 import org.apache.http.protocol.HTTP;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.webkit.CookieManager;
@@ -30,7 +42,7 @@ public class HttpUrlStack implements HttpStack
 
     private static final String    HEADER_CONTENT_TYPE        = "Content-Type";
     private static final int       DEFAULT_SOCKET_TIMEOUT     = 10 * 1000;
-    
+
     private final Context          context;
     private final SSLSocketFactory mSslSocketFactory;
 
@@ -39,7 +51,7 @@ public class HttpUrlStack implements HttpStack
     private boolean                fixNoHttpResponseException = false;
     private boolean                isAccpetCookies            = true;
     private String                 mBasicAuth                 = null;
-    private String                 mUserAgent                  = null;
+    private String                 mUserAgent                 = null;
     private Proxy                  mProxy                     = null;
 
     public HttpUrlStack(Context context)
@@ -73,7 +85,48 @@ public class HttpUrlStack implements HttpStack
         addHeaders(headerMap, connection);
         setParams(request, connection, responseDelivery);
 
-        return null;
+        ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 1);
+        int responseCode = connection.getResponseCode();
+        if (responseCode == -1)
+        {
+            throw new IOException("Could not retrieve response code from HttpUrlConnection.");
+        }
+       
+        StatusLine responseStatus = new BasicStatusLine(protocolVersion, connection.getResponseCode(), connection.getResponseMessage());
+        BasicHttpResponse response = new BasicHttpResponse(responseStatus);
+        response.setEntity(entityFromConnection(connection));
+        
+        
+        for (Entry<String, List<String>> header : connection.getHeaderFields().entrySet())
+        {
+            if (header.getKey() != null)
+            {
+                String key = header.getKey();
+                String value = header.getValue().get(0);
+                Header h = new BasicHeader(key, value);
+                response.addHeader(h);
+            }
+        }
+
+        Map<String, List<String>> headerFields = connection.getHeaderFields();
+        if (headerFields != null)
+        {
+            List<String> cookies = headerFields.get("Set-Cookie");
+            if (cookies != null)
+            {
+                CookieManager cookieManager = CookieManager.getInstance();
+                for (String cookie : cookies)
+                {
+                    if (cookie == null)
+                        continue;
+                    cookieManager.setCookie(connection.getURL().toString(), cookie);
+                }
+                if (Build.VERSION.SDK_INT >= 14)
+                    CookieSyncManager.getInstance().sync();
+            }
+        }
+        
+        return response;
     }
 
     private HttpURLConnection openConnection(String parsedUrl, Request<?> request) throws IOException
@@ -178,13 +231,31 @@ public class HttpUrlStack implements HttpStack
         // if (body != null)
         // {
         // connection.setDoOutput(true);
-        // connection.addRequestProperty(HEADER_CONTENT_TYPE,
+//         connection.addRequestProperty(HEADER_CONTENT_TYPE,
         // request.getBodyContentType());
         // DataOutputStream out = new
         // DataOutputStream(connection.getOutputStream());
         // out.write(body);
         // out.close();
         // }
+    }
+
+    private HttpEntity entityFromConnection(HttpURLConnection connection)
+    {
+        BasicHttpEntity entity = new BasicHttpEntity();
+        InputStream inputStream;
+        try
+        {
+            inputStream = connection.getInputStream();
+        } catch (IOException ioe)
+        {
+            inputStream = connection.getErrorStream();
+        }
+        entity.setContent(inputStream);
+        entity.setContentLength(connection.getContentLength());
+        entity.setContentEncoding(connection.getContentEncoding());
+        entity.setContentType(connection.getContentType());
+        return entity;
     }
 
     public void setProxy(String host, int port)

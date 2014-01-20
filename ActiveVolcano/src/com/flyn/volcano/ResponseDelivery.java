@@ -3,9 +3,18 @@ package com.flyn.volcano;
 public interface ResponseDelivery
 {
 
-    public void postResponse(Request<?> request, Response<?> response);
+    void sendStartMessage(Request<?> request);
 
-    public void postResponse(Request<?> request, Response<?> response, Runnable runnable);
+    void sendFinishMessage(Request<?> request);
 
-    public void postError(Request<?> request, Exception error);
+    void sendProgressMessage(Request<?> request, int bytesWritten, int bytesTotal, int currentSpeed);
+
+    void sendCancleMessage(Request<?> request);
+
+    void sendSuccessMessage(Request<?> request, Response<?> response);
+
+    void sendFailureMessage(Request<?> request, Throwable error);
+
+    void sendRetryMessage(int retryNo);
+
 }

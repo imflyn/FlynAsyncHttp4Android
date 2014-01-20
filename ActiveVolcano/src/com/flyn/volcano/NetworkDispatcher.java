@@ -1,7 +1,8 @@
 package com.flyn.volcano;
 
-import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
+
+import android.os.Process;
 
 public class NetworkDispatcher extends Thread
 {
@@ -20,34 +21,61 @@ public class NetworkDispatcher extends Thread
     @Override
     public void run()
     {
+        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
         Request<?> request = null;
-        try
-        {
 
-            request = this.mQueue.take();
-
-        } catch (InterruptedException e1)
+        while (true)
         {
-            e1.printStackTrace();
+            try
+            {
+                request = this.mQueue.take();
+            } catch (InterruptedException e)
+            {
+                if (this.mQuit)
+                    return;
+
+                continue;
+            }
+
+            if (request.isCanceled())
+            {
+                request.finish();
+                this.mDelivery.sendCancleMessage(request);
+                continue;
+            }
+            for (int retryCount = 0; retryCount < request.getRetryCount(); retryCount++)
+            {
+                try
+                {
+                    NetworkResponse networkResponse = this.mNetwork.executeRequest(request, this.mDelivery);
+
+                    if (networkResponse.isNotModified() && request.hasHadResponseDelivered())
+                    {
+                        request.finish();
+                        this.mDelivery.sendFinishMessage(request);
+                        continue;
+                    }
+
+                    Response<?> response = request.parseNetworkResponse(networkResponse);
+
+                    request.markDelivered();
+                    request.finish();
+                    this.mDelivery.sendSuccessMessage(request, response);
+
+                    break;
+                } catch (Exception e)
+                {
+                    this.mDelivery.sendFailureMessage(request, e);
+                }
+            }
+
+            this.mDelivery.sendFinishMessage(request);
         }
-
-        NetworkResponse networkResponse = null;
-        try
-        {
-            networkResponse = this.mNetwork.executeRequest(request, this.mDelivery);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        Response<?> response = request.parseNetworkResponse(networkResponse);
-
-        this.mDelivery.postResponse(request, response);
-
     }
 
     public void quit()
     {
-
+        this.mQuit = true;
+        interrupt();
     }
 }
