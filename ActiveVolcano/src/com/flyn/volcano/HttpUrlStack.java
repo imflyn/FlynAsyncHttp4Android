@@ -91,12 +91,11 @@ public class HttpUrlStack implements HttpStack
         {
             throw new IOException("Could not retrieve response code from HttpUrlConnection.");
         }
-       
+
         StatusLine responseStatus = new BasicStatusLine(protocolVersion, connection.getResponseCode(), connection.getResponseMessage());
         BasicHttpResponse response = new BasicHttpResponse(responseStatus);
         response.setEntity(entityFromConnection(connection));
-        
-        
+
         for (Entry<String, List<String>> header : connection.getHeaderFields().entrySet())
         {
             if (header.getKey() != null)
@@ -125,7 +124,7 @@ public class HttpUrlStack implements HttpStack
                     CookieSyncManager.getInstance().sync();
             }
         }
-        
+
         return response;
     }
 
@@ -231,7 +230,7 @@ public class HttpUrlStack implements HttpStack
         // if (body != null)
         // {
         // connection.setDoOutput(true);
-//         connection.addRequestProperty(HEADER_CONTENT_TYPE,
+        // connection.addRequestProperty(HEADER_CONTENT_TYPE,
         // request.getBodyContentType());
         // DataOutputStream out = new
         // DataOutputStream(connection.getOutputStream());
