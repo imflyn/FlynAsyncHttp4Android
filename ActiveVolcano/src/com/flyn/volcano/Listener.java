@@ -1,6 +1,6 @@
 package com.flyn.volcano;
 
-public interface Listener
+public interface Listener<T>
 {
 
     void onStart();

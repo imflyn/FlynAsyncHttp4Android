@@ -41,7 +41,11 @@ public class BasicNetwork implements Network
 
             if (statusCode < 200 || statusCode > 299)
             {
-                throw new IOException();
+                throw new IOException("Error statusCode:"+statusCode);
+            }
+            if(entity==null)
+            {
+                throw new IOException("ExecuteRequesting HttpEntity is null.");  
             }
             networkResponse = new NetworkResponse(statusCode, entity, responseHeaders, false);
         } catch (SocketTimeoutException e)

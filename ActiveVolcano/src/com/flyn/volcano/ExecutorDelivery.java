@@ -37,7 +37,6 @@ public class ExecutorDelivery implements ResponseDelivery
     @Override
     public void sendSuccessMessage(Request<?> request, Response<?> response)
     {
-
     }
 
     @Override
