@@ -29,11 +29,10 @@ public class HttpUrlStack implements HttpStack
 {
 
     private static final String    HEADER_CONTENT_TYPE        = "Content-Type";
-
+    private static final int       DEFAULT_SOCKET_TIMEOUT     = 10 * 1000;
+    
     private final Context          context;
     private final SSLSocketFactory mSslSocketFactory;
-
-    private static final int       DEFAULT_SOCKET_TIMEOUT     = 10 * 1000;
 
     private int                    timeout                    = DEFAULT_SOCKET_TIMEOUT;
     private boolean                isEnableRedirects          = false;
@@ -103,13 +102,13 @@ public class HttpUrlStack implements HttpStack
         connection.setDoInput(true);
         connection.setRequestProperty("Charsert", HTTP.UTF_8);
         connection.setRequestProperty("Connection", "Keep-Alive");
-        
+
         if (this.isAccpetCookies)
             connection.setRequestProperty("Cookie", getCookies(parsedUrl));
-        
+
         if (Utils.CMMAP_Request(this.context))
             connection.addRequestProperty("X-Online-Host", parsedUrl);
-        
+
         if (!TextUtils.isEmpty(this.userAgent))
             connection.setRequestProperty("User-Agent", this.userAgent);
         else
@@ -175,15 +174,17 @@ public class HttpUrlStack implements HttpStack
 
     private void uploadIfNeeded(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery)
     {
-//        byte[] body = request.getBody();
-//        if (body != null)
-//        {
-//            connection.setDoOutput(true);
-//            connection.addRequestProperty(HEADER_CONTENT_TYPE, request.getBodyContentType());
-//            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-//            out.write(body);
-//            out.close();
-//        }      
+        // byte[] body = request.getBody();
+        // if (body != null)
+        // {
+        // connection.setDoOutput(true);
+        // connection.addRequestProperty(HEADER_CONTENT_TYPE,
+        // request.getBodyContentType());
+        // DataOutputStream out = new
+        // DataOutputStream(connection.getOutputStream());
+        // out.write(body);
+        // out.close();
+        // }
     }
 
     public void setProxy(String host, int port)

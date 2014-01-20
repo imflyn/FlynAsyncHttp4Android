@@ -45,9 +45,9 @@ public class NetworkDispatcher extends Thread
         mDelivery.postResponse(request, response);
 
     }
-    
+
     public void quit()
     {
-        
+
     }
 }
