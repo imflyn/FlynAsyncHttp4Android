@@ -3,31 +3,31 @@ package com.flyn.volcano;
 public abstract class Listener<T>
 {
 
-    void onStart()
+    public void onStart()
     {
 
     };
 
-    void onFinish()
+    public void onFinish()
     {
 
     };
 
-    void onProgress(int bytesWritten, int bytesTotal, int currentSpeed)
+    public void onProgress(int bytesWritten, int bytesTotal, int currentSpeed)
     {
 
     };
 
-    void onCancel()
+    public void onCancel()
     {
 
     };
 
-    abstract void onSuccess(Object result);
+    public abstract void onSuccess(Object result);
 
-    abstract void onFailure(Throwable error);
+    public abstract void onFailure(Throwable error);
 
-    void onRetry(int retryNo)
+    public void onRetry(int retryNo)
     {
 
     };

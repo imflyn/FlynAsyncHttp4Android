@@ -20,6 +20,11 @@ public class StringRequest extends Request<String>
     {
         super(Method.GET, url, requestPramas, retryCount,mListener);
     }
+    
+    public StringRequest(String url, RequestParams requestPramas, Listener<String> mListener)
+    {
+        super(Method.GET, url, requestPramas, DEFAULT_RETRY_COUNT,mListener);
+    }
 
     @Override
     protected Response<?> parseNetworkResponse(NetworkResponse response, ResponseDelivery responseDelivery) throws IOException
