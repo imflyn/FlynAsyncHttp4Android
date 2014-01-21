@@ -57,10 +57,10 @@ public class NetworkDispatcher extends Thread
                     }
 
                     Response<?> response = request.parseNetworkResponse(networkResponse, this.mDelivery);
-                   
+
                     this.mDelivery.sendSuccessMessage(request, response);
                     this.mDelivery.sendFinishMessage(request);
-                    
+
                     request.markDelivered();
                     request.finish();
                     break;
@@ -68,11 +68,11 @@ public class NetworkDispatcher extends Thread
                 {
                     this.mDelivery.sendFailureMessage(request, e);
                 }
-          
+
             }
             request.finish();
             this.mDelivery.sendFinishMessage(request);
-         
+
         }
     }
 

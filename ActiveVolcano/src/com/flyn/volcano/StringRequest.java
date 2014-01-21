@@ -6,24 +6,24 @@ import java.io.UnsupportedEncodingException;
 public class StringRequest extends Request<String>
 {
 
-    public StringRequest(int method, String url, RequestParams requestPramas, Listener  mListener)
+    public StringRequest(int method, String url, RequestParams requestPramas, Listener mListener)
     {
-        super(method, url, requestPramas,mListener);
+        super(method, url, requestPramas, mListener);
     }
 
-    public StringRequest(int method, String url, RequestParams requestPramas, int retryCount, Listener  mListener)
+    public StringRequest(int method, String url, RequestParams requestPramas, int retryCount, Listener mListener)
     {
-        super(method, url, requestPramas, retryCount,mListener);
+        super(method, url, requestPramas, retryCount, mListener);
     }
 
-    public StringRequest(String url, RequestParams requestPramas, int retryCount, Listener  mListener)
+    public StringRequest(String url, RequestParams requestPramas, int retryCount, Listener mListener)
     {
-        super(Method.GET, url, requestPramas, retryCount,mListener);
+        super(Method.GET, url, requestPramas, retryCount, mListener);
     }
-    
-    public StringRequest(String url, RequestParams requestPramas, Listener  mListener)
+
+    public StringRequest(String url, RequestParams requestPramas, Listener mListener)
     {
-        super(Method.GET, url, requestPramas, DEFAULT_RETRY_COUNT,mListener);
+        super(Method.GET, url, requestPramas, DEFAULT_RETRY_COUNT, mListener);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class StringRequest extends Request<String>
         String result;
         try
         {
-            result = new String(data, Utils.parseCharset(  response.getHeaders()));
+            result = new String(data, Utils.parseCharset(response.getHeaders()));
         } catch (UnsupportedEncodingException e)
         {
             result = new String(data);

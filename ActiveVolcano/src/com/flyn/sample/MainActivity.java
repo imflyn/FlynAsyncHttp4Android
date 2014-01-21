@@ -15,8 +15,7 @@ import com.flyn.volcano.Volcano;
 public class MainActivity extends Activity
 {
     RequestQueue queue;
-    
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -24,13 +23,13 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
         findViewById(R.id.button1).setOnClickListener(new OnClickListener()
         {
-            
+
             @Override
             public void onClick(View v)
             {
-                if(null==queue)
+                if (null == queue)
                 {
-                    queue=Volcano.newRequestQueue(getApplicationContext());
+                    queue = Volcano.newRequestQueue(getApplicationContext());
                     queue.add(new StringRequest("http://www.qq.com", null, new Listener()
                     {
 
@@ -45,16 +44,14 @@ public class MainActivity extends Activity
                         {
                             error.printStackTrace();
                         }
-                        
+
                     }));
-                }
-                else
+                } else
                 {
                     queue.stop();
                 }
             }
         });
-        
-        
+
     }
 }

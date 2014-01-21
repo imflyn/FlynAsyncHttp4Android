@@ -17,17 +17,17 @@ public class BitmapRequest extends Request<Bitmap>
 
     private static final Object sDecodeLock = new Object();
 
-    public BitmapRequest(int method, String url, RequestParams requestPramas, int retryCount, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener  mListener)
+    public BitmapRequest(int method, String url, RequestParams requestPramas, int retryCount, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener mListener)
     {
-        super(method, url, requestPramas, retryCount,mListener);
+        super(method, url, requestPramas, retryCount, mListener);
         this.mMaxHeight = mMaxHeight;
         this.mMaxWidth = mMaxWidth;
         this.mDecodeConfig = mDecodeConfig;
     }
 
-    public BitmapRequest(int method, String url, RequestParams requestPramas, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener  mListener)
+    public BitmapRequest(int method, String url, RequestParams requestPramas, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener mListener)
     {
-        super(method, url, requestPramas,mListener);
+        super(method, url, requestPramas, mListener);
         this.mMaxHeight = mMaxHeight;
         this.mMaxWidth = mMaxWidth;
         this.mDecodeConfig = mDecodeConfig;
@@ -40,7 +40,7 @@ public class BitmapRequest extends Request<Bitmap>
         return doParse(date);
     }
 
-    private Response<Bitmap> doParse(byte[] data)  throws IOException
+    private Response<Bitmap> doParse(byte[] data) throws IOException
     {
         Bitmap bitmap = null;
         synchronized (sDecodeLock)
@@ -79,7 +79,7 @@ public class BitmapRequest extends Request<Bitmap>
             } catch (OutOfMemoryError e)
             {
                 Log.e(TAG, "Caught OOM for " + data == null ? String.valueOf(0) : data.length + " byte image,", e);
-                throw new IOException("OutOfMemoryError:"+e.getMessage()); 
+                throw new IOException("OutOfMemoryError:" + e.getMessage());
             }
         }
 

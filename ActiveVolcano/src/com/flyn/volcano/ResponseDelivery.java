@@ -15,6 +15,6 @@ public interface ResponseDelivery
 
     void sendFailureMessage(Request<?> request, Throwable error);
 
-    void sendRetryMessage(Request<?> request,int retryNo);
+    void sendRetryMessage(Request<?> request, int retryNo);
 
 }

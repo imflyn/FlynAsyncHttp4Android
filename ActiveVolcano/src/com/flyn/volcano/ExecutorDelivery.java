@@ -77,9 +77,9 @@ public class ExecutorDelivery implements ResponseDelivery
     }
 
     @Override
-    public void sendSuccessMessage(final Request<?> request,final  Response<?> response)
+    public void sendSuccessMessage(final Request<?> request, final Response<?> response)
     {
-        
+
         this.mResponsePoster.execute(new Runnable()
         {
 

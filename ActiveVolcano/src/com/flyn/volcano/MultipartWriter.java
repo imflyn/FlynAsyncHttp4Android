@@ -158,10 +158,10 @@ public class MultipartWriter
 
     public void writeTo(final OutputStream outstream) throws IOException
     {
-        
-        if(this.request.isCanceled())
-            return ;
-        
+
+        if (this.request.isCanceled())
+            return;
+
         int length = (int) getContentLength();
         timer = new SpendTimer(length, new TimerListener()
         {
@@ -172,7 +172,7 @@ public class MultipartWriter
                 responseDelivery.sendProgressMessage(request, bytesWritten, bytesTotal, speed);
             }
         });
-        
+
         try
         {
             timer.start();
@@ -180,12 +180,12 @@ public class MultipartWriter
             this.connection.setRequestProperty("Content-Length", String.valueOf(length));
             this.out.writeTo(outstream);
             updateProgress(this.out.size());
-            
+
             for (FilePart filePart : this.fileParts)
             {
-                if(this.request.isCanceled())
-                    return ;
-                
+                if (this.request.isCanceled())
+                    return;
+
                 filePart.writeTo(outstream);
             }
             outstream.write(this.boundaryEnd);
@@ -244,16 +244,16 @@ public class MultipartWriter
 
         protected void writeTo(OutputStream out) throws IOException
         {
-            if(request.isCanceled())
-            return;
-            
+            if (request.isCanceled())
+                return;
+
             out.write(this.header);
             updateProgress(this.header.length);
 
             BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(this.file));
             final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
             int l;
-            while (!request.isCanceled()&&(l = inputStream.read(tmp)) != -1)
+            while (!request.isCanceled() && (l = inputStream.read(tmp)) != -1)
             {
                 out.write(tmp, 0, l);
                 updateProgress(l);

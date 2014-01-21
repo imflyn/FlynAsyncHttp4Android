@@ -29,7 +29,7 @@ public class SpendTimer
             this.bytesTotal = bytesTotal;
 
         this.timerListener = timerListener;
-    
+
     }
 
     protected void updateProgress(int count)
