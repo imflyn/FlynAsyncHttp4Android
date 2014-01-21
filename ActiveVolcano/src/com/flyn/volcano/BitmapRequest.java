@@ -40,7 +40,7 @@ public class BitmapRequest extends Request<Bitmap>
         return doParse(date);
     }
 
-    private Response<Bitmap> doParse(byte[] data)
+    private Response<Bitmap> doParse(byte[] data)  throws IOException
     {
         Bitmap bitmap = null;
         synchronized (sDecodeLock)
@@ -79,6 +79,7 @@ public class BitmapRequest extends Request<Bitmap>
             } catch (OutOfMemoryError e)
             {
                 Log.e(TAG, "Caught OOM for " + data == null ? String.valueOf(0) : data.length + " byte image,", e);
+                throw new IOException("OutOfMemoryError:"+e.getMessage()); 
             }
         }
 
