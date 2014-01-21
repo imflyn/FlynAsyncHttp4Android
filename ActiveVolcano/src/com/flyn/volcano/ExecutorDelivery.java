@@ -23,100 +23,114 @@ public class ExecutorDelivery implements ResponseDelivery
     @Override
     public void sendStartMessage(final Request<?> request)
     {
-        this.mResponsePoster.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+        final Listener listener = request.getListener();
+        if (listener != null)
+            this.mResponsePoster.execute(new Runnable()
             {
-                request.getListener().onStart();
-            }
-        });
+
+                @Override
+                public void run()
+                {
+                    listener.onStart();
+                }
+            });
     }
 
     @Override
     public void sendFinishMessage(final Request<?> request)
     {
-        this.mResponsePoster.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+        final Listener listener = request.getListener();
+        if (listener != null)
+            this.mResponsePoster.execute(new Runnable()
             {
-                request.getListener().onFinish();
-            }
-        });
+
+                @Override
+                public void run()
+                {
+                    listener.onFinish();
+                }
+            });
     }
 
     @Override
     public void sendProgressMessage(final Request<?> request, final int bytesWritten, final int bytesTotal, final int currentSpeed)
     {
-        this.mResponsePoster.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+        final Listener listener = request.getListener();
+        if (listener != null)
+            this.mResponsePoster.execute(new Runnable()
             {
-                request.getListener().onProgress(bytesWritten, bytesTotal, currentSpeed);
-            }
-        });
+
+                @Override
+                public void run()
+                {
+                    listener.onProgress(bytesWritten, bytesTotal, currentSpeed);
+                }
+            });
     }
 
     @Override
     public void sendCancleMessage(final Request<?> request)
     {
-        this.mResponsePoster.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+        final Listener listener = request.getListener();
+        if (listener != null)
+            this.mResponsePoster.execute(new Runnable()
             {
-                request.getListener().onCancel();
-            }
-        });
+
+                @Override
+                public void run()
+                {
+                    listener.onCancel();
+                }
+            });
     }
 
     @Override
     public void sendSuccessMessage(final Request<?> request, final Response<?> response)
     {
+        final Listener listener = request.getListener();
+        if (listener != null)
 
-        this.mResponsePoster.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+            this.mResponsePoster.execute(new Runnable()
             {
-                request.getListener().onSuccess(response);
-            }
-        });
+
+                @Override
+                public void run()
+                {
+                    listener.onSuccess(response);
+                }
+            });
     }
 
     @Override
     public void sendFailureMessage(final Request<?> request, final Throwable error)
     {
-        this.mResponsePoster.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+        final Listener listener = request.getListener();
+        if (listener != null)
+            this.mResponsePoster.execute(new Runnable()
             {
-                request.getListener().onFailure(error);
-            }
-        });
+
+                @Override
+                public void run()
+                {
+                    listener.onFailure(error);
+                }
+            });
     }
 
     @Override
     public void sendRetryMessage(final Request<?> request, final int retryNo)
     {
-        this.mResponsePoster.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+        final Listener listener = request.getListener();
+        if (listener != null)
+            this.mResponsePoster.execute(new Runnable()
             {
-                request.getListener().onRetry(retryNo);
-            }
-        });
+
+                @Override
+                public void run()
+                {
+                    listener.onRetry(retryNo);
+                }
+            });
     }
 
 }

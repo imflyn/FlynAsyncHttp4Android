@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -37,9 +36,8 @@ public class MultipartWriter
 
     private final ResponseDelivery       responseDelivery;
     private final Request<?>             request;
-    private final HttpURLConnection      connection;
 
-    public MultipartWriter(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery)
+    public MultipartWriter(Request<?> request,ResponseDelivery responseDelivery)
     {
         final StringBuilder buf = new StringBuilder();
         final Random rand = new Random();
@@ -51,13 +49,13 @@ public class MultipartWriter
         this.boundary = buf.toString();
         this.boundaryLine = ("--" + this.boundary + "\r\n").getBytes();
         this.boundaryEnd = ("--" + this.boundary + "--\r\n").getBytes();
-
+        
         this.responseDelivery = responseDelivery;
-        this.connection = connection;
         this.request = request;
 
         this.mPool = new ByteArrayPool(DEFAULT_BUFFER_SIZE);
         this.out = new PoolingByteArrayOutputStream(this.mPool);
+        
 
     }
 
@@ -155,6 +153,16 @@ public class MultipartWriter
         contentLen += this.boundaryEnd.length;
         return contentLen;
     }
+    
+    protected boolean isEmpty()
+    {
+        return this.fileParts==null||this.fileParts.size()==0;
+    }
+
+    protected final String getBoundary()
+    {
+        return boundary;
+    }
 
     public void writeTo(final OutputStream outstream) throws IOException
     {
@@ -176,8 +184,6 @@ public class MultipartWriter
         try
         {
             timer.start();
-            this.connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + this.boundary);
-            this.connection.setRequestProperty("Content-Length", String.valueOf(length));
             this.out.writeTo(outstream);
             updateProgress(this.out.size());
 
@@ -265,4 +271,7 @@ public class MultipartWriter
             Utils.quickClose(inputStream);
         }
     }
+    
+ 
+    
 }

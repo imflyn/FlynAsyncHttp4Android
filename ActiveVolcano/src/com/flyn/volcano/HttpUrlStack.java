@@ -48,7 +48,7 @@ public class HttpUrlStack implements HttpStack
     private final SSLSocketFactory mSslSocketFactory;
 
     private int                    timeout                    = DEFAULT_SOCKET_TIMEOUT;
-    private boolean                isEnableRedirects          = false;
+    private boolean                isEnableRedirects          = true;
     private boolean                fixNoHttpResponseException = false;
     private boolean                isAccpetCookies            = true;
     private String                 mBasicAuth                 = null;
@@ -132,6 +132,7 @@ public class HttpUrlStack implements HttpStack
     private HttpURLConnection openConnection(String parsedUrl, Request<?> request) throws IOException
     {
         HttpURLConnection connection = null;
+        parsedUrl = Utils.getUrlWithParams(parsedUrl, request.getRequestPramas());
         URL url = new URL(parsedUrl);
 
         // 对移动wap网络的特殊处理
@@ -234,7 +235,7 @@ public class HttpUrlStack implements HttpStack
         Map<String, FileWrapper> fileMap = requestParams.getFileParams();
         Map<String, StreamWrapper> streamMap = requestParams.getStreamParams();
 
-        MultipartWriter writer = new MultipartWriter(request, connection, responseDelivery);
+        MultipartWriter writer = new MultipartWriter(request, responseDelivery);
         for (Entry<String, FileWrapper> entry : fileMap.entrySet())
         {
             writer.addPart(entry.getKey(), entry.getValue().file, entry.getValue().contentType);
@@ -243,14 +244,20 @@ public class HttpUrlStack implements HttpStack
         {
             writer.addPart(entry.getKey(), entry.getValue().name, entry.getValue().inputStream, entry.getValue().contentType);
         }
-        connection.setDoOutput(true);
-        OutputStream outStream = connection.getOutputStream();
-        try
+
+        if (!writer.isEmpty())
         {
-            writer.writeTo(outStream);
-        } finally
-        {
-            Utils.quickClose(outStream);
+            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + writer.getBoundary());
+            connection.setRequestProperty("Content-Length", String.valueOf(writer.getContentLength()));
+            connection.setDoOutput(true);
+            OutputStream outStream = connection.getOutputStream();
+            try
+            {
+                writer.writeTo(outStream);
+            } finally
+            {
+                Utils.quickClose(outStream);
+            }
         }
 
     }

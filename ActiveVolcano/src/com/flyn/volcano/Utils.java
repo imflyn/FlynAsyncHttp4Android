@@ -47,6 +47,15 @@ public class Utils
         return HTTP.DEFAULT_CONTENT_CHARSET;
     }
 
+    public static String parseContentEnconding(Map<String, String> headers)
+    {
+        String contentType = headers.get(HTTP.CONTENT_ENCODING);
+        if (contentType != null)
+            return contentType;
+
+        return "";
+    }
+
     /**
      * Parse date in RFC1123 format, and return its value as epoch
      */
@@ -91,12 +100,9 @@ public class Utils
      * @param params
      * @return
      */
-    public static String getUrlWithParams(boolean shouldEncodeUrl, String url, RequestParams params)
+    public static String getUrlWithParams(String url, RequestParams params)
     {
-        if (shouldEncodeUrl)
-        {
-            url = url.replace(" ", "%20");
-        }
+        url = url.replace(" ", "%20");
         if (null != params)
         {
             // String paramString = params.getUrlParams();

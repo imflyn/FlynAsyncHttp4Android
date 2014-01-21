@@ -50,6 +50,7 @@ public class RequestQueue
 
     public void stop()
     {
+        cancelAll();
         for (int i = 0; i < this.mDispatchers.length; i++)
         {
             if (this.mDispatchers[i] != null)

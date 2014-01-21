@@ -45,6 +45,9 @@ public class NetworkDispatcher extends Thread
             }
             for (int retryCount = 0; retryCount < request.getRetryCount(); retryCount++)
             {
+                if (this.mQuit)
+                    return;
+                
                 try
                 {
                     NetworkResponse networkResponse = this.mNetwork.executeRequest(request, this.mDelivery);

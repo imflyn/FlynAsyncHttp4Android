@@ -32,6 +32,14 @@ public class BitmapRequest extends Request<Bitmap>
         this.mMaxWidth = mMaxWidth;
         this.mDecodeConfig = mDecodeConfig;
     }
+    
+    public BitmapRequest(String url,  int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener mListener)
+    {
+        super(Method.GET, url, null, mListener);
+        this.mMaxHeight = mMaxHeight;
+        this.mMaxWidth = mMaxWidth;
+        this.mDecodeConfig = mDecodeConfig;
+    }
 
     @Override
     protected Response<?> parseNetworkResponse(NetworkResponse response, ResponseDelivery responseDelivery) throws IOException

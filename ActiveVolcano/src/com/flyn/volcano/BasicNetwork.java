@@ -64,17 +64,17 @@ public class BasicNetwork implements Network
                 statusCode = httpResponse.getStatusLine().getStatusCode();
             } else
             {
-                throw new IOException("HttpResponse is null");
+                throw new IOException("HttpResponse is null:"+e.getMessage());
             }
             if (entity != null)
             {
                 networkResponse = new NetworkResponse(statusCode, entity, responseHeaders, false);
                 if (statusCode == HttpStatus.SC_UNAUTHORIZED || statusCode == HttpStatus.SC_FORBIDDEN)
                 {
-                    throw new IOException("Unauthorized error");
+                    throw new IOException("Unauthorized error and statusCode:"+statusCode);
                 } else
                 {
-                    throw new IOException("Server error");
+                    throw new IOException("Server error and statusCode:"+statusCode);
                 }
             } else
             {

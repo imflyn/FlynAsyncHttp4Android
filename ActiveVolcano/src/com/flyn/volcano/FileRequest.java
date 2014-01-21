@@ -38,7 +38,10 @@ public class FileRequest extends Request<File>
         this.isContinue = isContinue;
 
         this.mFile = new File(savePath, fileName);
-        String tempname = fileName.substring(0, fileName.lastIndexOf("."));
+        String tempname = fileName;
+        if (fileName.contains("."))
+            tempname = fileName.substring(0, fileName.lastIndexOf("."));
+
         this.tempFile = new File(savePath, tempname + ".tmp");
 
         if (!this.mFile.getParentFile().exists())
@@ -48,6 +51,11 @@ public class FileRequest extends Request<File>
     public FileRequest(int method, String url, RequestParams requestPramas, String savePath, String fileName, boolean isContinue, Listener mListener)
     {
         this(method, url, requestPramas, DEFAULT_RETRY_COUNT, savePath, fileName, isContinue, mListener);
+    }
+
+    public FileRequest(String url, String savePath, String fileName, boolean isContinue, Listener mListener)
+    {
+        this(Method.GET, url, null, DEFAULT_RETRY_COUNT, savePath, fileName, isContinue, mListener);
     }
 
     private File getTargetFile()
@@ -114,7 +122,7 @@ public class FileRequest extends Request<File>
             int count;
             byte[] buffer = new byte[4096];
 
-            while (!isCanceled() && (count = inputStream.read(buffer)) != -1)
+            while (!isCanceled() && (count = inputStream.read(buffer)) != -1&& !Thread.currentThread().isInterrupted())
             {
                 accessFile.write(buffer, 0, count);
                 timer.updateProgress(count);

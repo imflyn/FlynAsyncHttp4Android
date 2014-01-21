@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.http.HttpEntity;
 
@@ -54,7 +55,17 @@ public abstract class Request<T> implements Comparable<Request<T>>
             if (isCanceled())
                 return null;
             
-            BufferedInputStream bufferedInputStream=new BufferedInputStream(inStream);
+            BufferedInputStream bufferedInputStream=null;
+            
+            if(Utils.parseContentEnconding(response.getHeaders()).equals("gzip"))
+            {
+                bufferedInputStream=  new BufferedInputStream(new GZIPInputStream(inStream));
+            }
+            else
+            {
+                bufferedInputStream=  new BufferedInputStream(inStream);
+            }
+          
             
             long contentLength = entity.getContentLength();
             if (contentLength > Integer.MAX_VALUE)
