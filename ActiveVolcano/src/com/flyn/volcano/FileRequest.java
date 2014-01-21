@@ -29,7 +29,7 @@ public class FileRequest extends Request<File>
 
     private final boolean       isContinue;
 
-    public FileRequest(int method, String url, RequestParams requestPramas, int retryCount, String savePath, String fileName, boolean isContinue, Listener<File> mListener)
+    public FileRequest(int method, String url, RequestParams requestPramas, int retryCount, String savePath, String fileName, boolean isContinue, Listener  mListener)
     {
         super(method, url, requestPramas, retryCount,mListener);
         if (TextUtils.isEmpty(savePath) || TextUtils.isEmpty(fileName))
@@ -45,7 +45,7 @@ public class FileRequest extends Request<File>
             this.mFile.getParentFile().mkdirs();
     }
 
-    public FileRequest(int method, String url, RequestParams requestPramas, String savePath, String fileName, boolean isContinue, Listener<File> mListener)
+    public FileRequest(int method, String url, RequestParams requestPramas, String savePath, String fileName, boolean isContinue, Listener  mListener)
     {
         this(method, url, requestPramas, DEFAULT_RETRY_COUNT, savePath, fileName, isContinue,mListener);
     }

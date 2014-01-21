@@ -17,7 +17,7 @@ public class BitmapRequest extends Request<Bitmap>
 
     private static final Object sDecodeLock = new Object();
 
-    public BitmapRequest(int method, String url, RequestParams requestPramas, int retryCount, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener<Bitmap> mListener)
+    public BitmapRequest(int method, String url, RequestParams requestPramas, int retryCount, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener  mListener)
     {
         super(method, url, requestPramas, retryCount,mListener);
         this.mMaxHeight = mMaxHeight;
@@ -25,7 +25,7 @@ public class BitmapRequest extends Request<Bitmap>
         this.mDecodeConfig = mDecodeConfig;
     }
 
-    public BitmapRequest(int method, String url, RequestParams requestPramas, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener<Bitmap> mListener)
+    public BitmapRequest(int method, String url, RequestParams requestPramas, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener  mListener)
     {
         super(method, url, requestPramas,mListener);
         this.mMaxHeight = mMaxHeight;

@@ -6,22 +6,22 @@ import java.io.UnsupportedEncodingException;
 public class StringRequest extends Request<String>
 {
 
-    public StringRequest(int method, String url, RequestParams requestPramas, Listener<String> mListener)
+    public StringRequest(int method, String url, RequestParams requestPramas, Listener  mListener)
     {
         super(method, url, requestPramas,mListener);
     }
 
-    public StringRequest(int method, String url, RequestParams requestPramas, int retryCount, Listener<String> mListener)
+    public StringRequest(int method, String url, RequestParams requestPramas, int retryCount, Listener  mListener)
     {
         super(method, url, requestPramas, retryCount,mListener);
     }
 
-    public StringRequest(String url, RequestParams requestPramas, int retryCount, Listener<String> mListener)
+    public StringRequest(String url, RequestParams requestPramas, int retryCount, Listener  mListener)
     {
         super(Method.GET, url, requestPramas, retryCount,mListener);
     }
     
-    public StringRequest(String url, RequestParams requestPramas, Listener<String> mListener)
+    public StringRequest(String url, RequestParams requestPramas, Listener  mListener)
     {
         super(Method.GET, url, requestPramas, DEFAULT_RETRY_COUNT,mListener);
     }
