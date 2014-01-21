@@ -24,10 +24,12 @@ public class SpendTimer
             throw new IllegalStateException("TimerListener can' be null.");
 
         if (bytesTotal < 0)
-            throw new IllegalStateException("BytesTotal must greater than zero.");
+            this.bytesTotal = 0;
+        else
+            this.bytesTotal = bytesTotal;
 
         this.timerListener = timerListener;
-        this.bytesTotal = bytesTotal;
+    
     }
 
     protected void updateProgress(int count)

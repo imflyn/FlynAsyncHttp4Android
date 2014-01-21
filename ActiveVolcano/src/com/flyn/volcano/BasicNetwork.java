@@ -38,7 +38,7 @@ public class BasicNetwork implements Network
             responseHeaders = convertHeaders(httpResponse.getAllHeaders());
 
             entity = httpResponse.getEntity();
-
+            
             if (statusCode < 200 || statusCode > 299)
             {
                 throw new IOException("Error statusCode:" + statusCode);

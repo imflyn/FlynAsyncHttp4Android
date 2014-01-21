@@ -155,7 +155,8 @@ public class HttpUrlStack implements HttpStack
         connection.setDoInput(true);
         connection.setRequestProperty("Charsert", HTTP.UTF_8);
         connection.setRequestProperty("Connection", "Keep-Alive");
-
+        connection.setRequestProperty("Accept-encoding", "gzip");
+        
         if (this.isAccpetCookies)
             connection.setRequestProperty("Cookie", getCookies(parsedUrl));
 

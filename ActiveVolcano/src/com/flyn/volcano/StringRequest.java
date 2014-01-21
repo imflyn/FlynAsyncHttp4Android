@@ -34,7 +34,7 @@ public class StringRequest extends Request<String>
         String result;
         try
         {
-            result = new String(data, Utils.parseCharset(getHeaders()));
+            result = new String(data, Utils.parseCharset(  response.getHeaders()));
         } catch (UnsupportedEncodingException e)
         {
             result = new String(data);
