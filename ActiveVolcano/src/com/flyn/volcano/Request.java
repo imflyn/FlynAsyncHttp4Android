@@ -14,6 +14,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
 {
     protected static final int  DEFAULT_RETRY_COUNT = 1;
 
+    private final Listener<T>   mListener;
     private final String        url;
     private final RequestParams requestPramas;
     private final int           method;
@@ -24,17 +25,18 @@ public abstract class Request<T> implements Comparable<Request<T>>
     private Object              tag;
     private RequestQueue        mRequestQueue;
 
-    public Request(int method, String url, RequestParams requestPramas)
+    public Request(int method, String url, RequestParams requestPramas, Listener<T> mListener)
     {
-        this(method, url, requestPramas, DEFAULT_RETRY_COUNT);
+        this(method, url, requestPramas, DEFAULT_RETRY_COUNT, mListener);
     }
 
-    public Request(int method, String url, RequestParams requestPramas, int retryCount)
+    public Request(int method, String url, RequestParams requestPramas, int retryCount, Listener<T> mListener)
     {
         this.method = method;
         this.requestPramas = requestPramas;
         this.url = url;
         this.retryCount = retryCount;
+        this.mListener = mListener;
     }
 
     protected abstract Response<?> parseNetworkResponse(NetworkResponse response, final ResponseDelivery responseDelivery) throws IOException;
@@ -105,8 +107,6 @@ public abstract class Request<T> implements Comparable<Request<T>>
         return responseData;
 
     }
-
-    abstract protected void deliverResponse(T response);
 
     protected final int getMethod()
     {
@@ -186,8 +186,14 @@ public abstract class Request<T> implements Comparable<Request<T>>
     {
         this.mRequestQueue = requestQueue;
     }
+    
+    
+    public final Listener<T> getListener()
+    {
+        return mListener;
+    }
 
-    void finish()
+    protected void finish()
     {
         if (this.mRequestQueue != null)
         {

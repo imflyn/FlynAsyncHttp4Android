@@ -9,31 +9,28 @@ import android.util.Log;
 
 public class BitmapRequest extends Request<Bitmap>
 {
-    private final static String    TAG         = BitmapRequest.class.getName();
+    private final static String TAG         = BitmapRequest.class.getName();
 
-    private final Listener<Bitmap> mListener;
-    private final Config           mDecodeConfig;
-    private final int              mMaxWidth;
-    private final int              mMaxHeight;
+    private final Config        mDecodeConfig;
+    private final int           mMaxWidth;
+    private final int           mMaxHeight;
 
-    private static final Object    sDecodeLock = new Object();
+    private static final Object sDecodeLock = new Object();
 
-    public BitmapRequest(int method, String url, RequestParams requestPramas, int retryCount, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener<Bitmap> listener)
+    public BitmapRequest(int method, String url, RequestParams requestPramas, int retryCount, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener<Bitmap> mListener)
     {
-        super(method, url, requestPramas, retryCount);
+        super(method, url, requestPramas, retryCount,mListener);
         this.mMaxHeight = mMaxHeight;
         this.mMaxWidth = mMaxWidth;
         this.mDecodeConfig = mDecodeConfig;
-        this.mListener = listener;
     }
 
-    public BitmapRequest(int method, String url, RequestParams requestPramas, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener<Bitmap> listener)
+    public BitmapRequest(int method, String url, RequestParams requestPramas, int mMaxWidth, int mMaxHeight, Config mDecodeConfig, Listener<Bitmap> mListener)
     {
-        super(method, url, requestPramas);
+        super(method, url, requestPramas,mListener);
         this.mMaxHeight = mMaxHeight;
         this.mMaxWidth = mMaxWidth;
         this.mDecodeConfig = mDecodeConfig;
-        this.mListener = listener;
     }
 
     @Override
@@ -88,13 +85,7 @@ public class BitmapRequest extends Request<Bitmap>
         return Response.build(bitmap);
     }
 
-    @Override
-    protected void deliverResponse(Bitmap response)
-    {
-        // mListener.onResponse(response);
-    }
-
-    private static int getResizedDimension(int maxPrimary, int maxSecondary, int actualPrimary, int actualSecondary)
+    private int getResizedDimension(int maxPrimary, int maxSecondary, int actualPrimary, int actualSecondary)
     {
         if (maxPrimary == 0 && maxSecondary == 0)
         {
@@ -121,7 +112,7 @@ public class BitmapRequest extends Request<Bitmap>
         return resized;
     }
 
-    private static int findBestSampleSize(int actualWidth, int actualHeight, int desiredWidth, int desiredHeight)
+    private int findBestSampleSize(int actualWidth, int actualHeight, int desiredWidth, int desiredHeight)
     {
         double wr = (double) actualWidth / desiredWidth;
         double hr = (double) actualHeight / desiredHeight;

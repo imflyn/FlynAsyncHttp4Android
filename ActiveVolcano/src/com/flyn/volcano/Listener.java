@@ -1,20 +1,35 @@
 package com.flyn.volcano;
 
-public interface Listener<T>
+public abstract class Listener<T>
 {
 
-    void onStart();
+    void onStart()
+    {
 
-    void onFinish();
+    };
 
-    void onProgress(int bytesWritten, int bytesTotal, int currentSpeed);
+    void onFinish()
+    {
 
-    void onCancel();
+    };
 
-    void onSuccess();
+    void onProgress(int bytesWritten, int bytesTotal, int currentSpeed)
+    {
 
-    void onFailure();
+    };
 
-    void onRetry(int retryNo);
+    void onCancel()
+    {
+
+    };
+
+    abstract void onSuccess(Object result);
+
+    abstract void onFailure(Throwable error);
+
+    void onRetry(int retryNo)
+    {
+
+    };
 
 }

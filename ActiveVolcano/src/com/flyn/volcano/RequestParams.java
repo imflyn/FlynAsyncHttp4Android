@@ -61,12 +61,12 @@ public class RequestParams
         this.mFileParams.put(key, new FileWrapper(value, contentType));
     }
 
-    public void put(String key, String name,InputStream inputStream)
+    public void put(String key, String name, InputStream inputStream)
     {
         put(key, name, inputStream, null);
     }
 
-    public void put(String key,String name, InputStream inputStream, String contentType)
+    public void put(String key, String name, InputStream inputStream, String contentType)
     {
         this.mStreamParams.put(key, new StreamWrapper(inputStream, name, contentType));
     }

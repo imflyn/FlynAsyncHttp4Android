@@ -7,6 +7,7 @@ import android.os.Handler;
 public class ExecutorDelivery implements ResponseDelivery
 {
     private final Executor mResponsePoster;
+
     public ExecutorDelivery(final Handler handler)
     {
         mResponsePoster = new Executor()
@@ -20,44 +21,101 @@ public class ExecutorDelivery implements ResponseDelivery
     }
 
     @Override
-    public void sendStartMessage(Request<?> request)
+    public void sendStartMessage(final Request<?> request)
     {
+        this.mResponsePoster.execute(new Runnable()
+        {
 
+            @Override
+            public void run()
+            {
+                request.getListener().onStart();
+            }
+        });
     }
 
     @Override
-    public void sendFinishMessage(Request<?> request)
+    public void sendFinishMessage(final Request<?> request)
     {
+        this.mResponsePoster.execute(new Runnable()
+        {
 
+            @Override
+            public void run()
+            {
+                request.getListener().onFinish();
+            }
+        });
     }
 
     @Override
-    public void sendProgressMessage(Request<?> request, int bytesWritten, int bytesTotal, int currentSpeed)
+    public void sendProgressMessage(final Request<?> request, final int bytesWritten, final int bytesTotal, final int currentSpeed)
     {
+        this.mResponsePoster.execute(new Runnable()
+        {
 
+            @Override
+            public void run()
+            {
+                request.getListener().onProgress(bytesWritten, bytesTotal, currentSpeed);
+            }
+        });
     }
 
     @Override
-    public void sendCancleMessage(Request<?> request)
+    public void sendCancleMessage(final Request<?> request)
     {
+        this.mResponsePoster.execute(new Runnable()
+        {
 
+            @Override
+            public void run()
+            {
+                request.getListener().onCancel();
+            }
+        });
     }
 
     @Override
-    public void sendSuccessMessage(Request<?> request, Response<?> response)
+    public void sendSuccessMessage(final Request<?> request, final Response<?> response)
     {
+        this.mResponsePoster.execute(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                request.getListener().onSuccess(response.result);
+            }
+        });
     }
 
     @Override
-    public void sendFailureMessage(Request<?> request, Throwable error)
+    public void sendFailureMessage(final Request<?> request, final Throwable error)
     {
+        this.mResponsePoster.execute(new Runnable()
+        {
 
+            @Override
+            public void run()
+            {
+                request.getListener().onFailure(error);
+            }
+        });
     }
 
     @Override
-    public void sendRetryMessage(int retryNo)
+    public void sendRetryMessage(final Request<?> request, final int retryNo)
     {
+        this.mResponsePoster.execute(new Runnable()
+        {
 
+            @Override
+            public void run()
+            {
+                request.getListener().onRetry(retryNo);
+            }
+        });
     }
-   
+
 }

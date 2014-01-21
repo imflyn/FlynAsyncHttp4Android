@@ -5,30 +5,20 @@ import java.io.UnsupportedEncodingException;
 
 public class StringRequest extends Request<String>
 {
-    private final Listener<String> mListener;
 
     public StringRequest(int method, String url, RequestParams requestPramas, Listener<String> mListener)
     {
-        super(method, url, requestPramas);
-        this.mListener = mListener;
+        super(method, url, requestPramas,mListener);
     }
 
     public StringRequest(int method, String url, RequestParams requestPramas, int retryCount, Listener<String> mListener)
     {
-        super(method, url, requestPramas, retryCount);
-        this.mListener = mListener;
+        super(method, url, requestPramas, retryCount,mListener);
     }
 
     public StringRequest(String url, RequestParams requestPramas, int retryCount, Listener<String> mListener)
     {
-        super(Method.GET, url, requestPramas, retryCount);
-        this.mListener = mListener;
-    }
-
-    @Override
-    protected void deliverResponse(String response)
-    {
-        // this.mListener.onResponse(response);
+        super(Method.GET, url, requestPramas, retryCount,mListener);
     }
 
     @Override

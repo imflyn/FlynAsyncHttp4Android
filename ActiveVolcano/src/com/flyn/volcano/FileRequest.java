@@ -29,9 +29,9 @@ public class FileRequest extends Request<File>
 
     private final boolean       isContinue;
 
-    public FileRequest(int method, String url, RequestParams requestPramas, int retryCount, String savePath, String fileName, boolean isContinue)
+    public FileRequest(int method, String url, RequestParams requestPramas, int retryCount, String savePath, String fileName, boolean isContinue, Listener<File> mListener)
     {
-        super(method, url, requestPramas, retryCount);
+        super(method, url, requestPramas, retryCount,mListener);
         if (TextUtils.isEmpty(savePath) || TextUtils.isEmpty(fileName))
             throw new IllegalArgumentException("Savepath or filename can't be null.");
 
@@ -45,9 +45,9 @@ public class FileRequest extends Request<File>
             this.mFile.getParentFile().mkdirs();
     }
 
-    public FileRequest(int method, String url, RequestParams requestPramas, String savePath, String fileName, boolean isContinue)
+    public FileRequest(int method, String url, RequestParams requestPramas, String savePath, String fileName, boolean isContinue, Listener<File> mListener)
     {
-        this(method, url, requestPramas, DEFAULT_RETRY_COUNT, savePath, fileName, isContinue);
+        this(method, url, requestPramas, DEFAULT_RETRY_COUNT, savePath, fileName, isContinue,mListener);
     }
 
     private File getTargetFile()
@@ -91,7 +91,7 @@ public class FileRequest extends Request<File>
         timer.start();
         BufferedInputStream inputStream = null;
         RandomAccessFile accessFile = null;
-        
+
         try
         {
             if (mFileList.contains(this.mFile))
@@ -133,17 +133,13 @@ public class FileRequest extends Request<File>
             if (null != getTargetFile())
                 mFileList.remove(getTargetFile());
 
+            entity.consumeContent();
+
             Utils.quickClose(accessFile);
             Utils.quickClose(inputStream);
         }
 
         return Response.build(getTargetFile());
-    }
-
-    @Override
-    protected void deliverResponse(File response)
-    {
-
     }
 
 }
