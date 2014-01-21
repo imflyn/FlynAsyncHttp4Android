@@ -88,10 +88,10 @@ public class FileRequest extends Request<File>
                 responseDelivery.sendProgressMessage(FileRequest.this, bytesWritten, bytesTotal, speed);
             }
         });
-
+        timer.start();
         BufferedInputStream inputStream = null;
         RandomAccessFile accessFile = null;
-        timer.start();
+        
         try
         {
             if (mFileList.contains(this.mFile))
