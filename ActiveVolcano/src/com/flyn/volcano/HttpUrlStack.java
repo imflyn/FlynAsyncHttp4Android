@@ -26,7 +26,6 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
-import org.apache.http.protocol.HTTP;
 
 import android.content.Context;
 import android.os.Build;
@@ -43,6 +42,7 @@ public class HttpUrlStack implements HttpStack
 {
 
     private static final int       DEFAULT_SOCKET_TIMEOUT     = 10 * 1000;
+    private static final String    DEFAULT_CHARSET            = "utf-8";
 
     private final Context          context;
     private final SSLSocketFactory mSslSocketFactory;
@@ -153,7 +153,9 @@ public class HttpUrlStack implements HttpStack
         connection.setReadTimeout(this.timeout);
         connection.setUseCaches(false);
         connection.setDoInput(true);
-        connection.setRequestProperty("Charsert", HTTP.UTF_8);
+        connection.setChunkedStreamingMode(0);
+        connection.setRequestProperty("Charsert", DEFAULT_CHARSET);
+        connection.setRequestProperty("Accept-Charset", DEFAULT_CHARSET);
         connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setRequestProperty("Accept-encoding", "gzip");
 

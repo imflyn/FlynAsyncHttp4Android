@@ -30,7 +30,7 @@ public class MainActivity extends Activity
                 if (null == queue)
                 {
                     queue = Volcano.newRequestQueue(getApplicationContext());
-                    queue.add(new StringRequest("http://www.qq.com", null, new Listener()
+                    queue.add(new StringRequest("http://www.baidu.com", null, new Listener()
                     {
 
                         @Override
@@ -44,7 +44,7 @@ public class MainActivity extends Activity
                         {
                             error.printStackTrace();
                         }
-
+                    
                     }));
                 } else
                 {

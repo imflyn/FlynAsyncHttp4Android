@@ -2,6 +2,7 @@ package com.flyn.volcano;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,12 +48,14 @@ public abstract class Request<T> implements Comparable<Request<T>>
         byte[] responseData = new byte[0];
         HttpEntity entity = response.getEntity();
 
-        BufferedInputStream inStream = new BufferedInputStream(entity.getContent());
+        InputStream inStream = entity.getContent();
         if (inStream != null)
         {
             if (isCanceled())
                 return null;
-
+            
+            BufferedInputStream bufferedInputStream=new BufferedInputStream(inStream);
+            
             long contentLength = entity.getContentLength();
             if (contentLength > Integer.MAX_VALUE)
             {
@@ -76,7 +79,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
             {
                 timer.start();
                 int count;
-                while (!isCanceled() && (count = inStream.read(buffer)) != -1 && !Thread.currentThread().isInterrupted())
+                while (!isCanceled() && (count = bufferedInputStream.read(buffer)) != -1 && !Thread.currentThread().isInterrupted())
                 {
                     bytes.write(buffer, 0, count);
                     timer.updateProgress(count);
