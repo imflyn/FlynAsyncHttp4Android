@@ -79,6 +79,7 @@ public class HttpUrlStack implements HttpStack
     public HttpResponse performRequest(Request<?> request, ResponseDelivery responseDelivery) throws IOException
     {
         String url = request.getUrl();
+        
         HashMap<String, String> headerMap = new HashMap<String, String>();
         headerMap.putAll(request.getHeaders());
 

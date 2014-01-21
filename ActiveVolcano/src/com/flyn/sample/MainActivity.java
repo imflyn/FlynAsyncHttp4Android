@@ -43,14 +43,14 @@ public class MainActivity extends Activity
                         @Override
                         public void onFailure(Throwable error)
                         {
-                            System.out.println(error);
+                            error.printStackTrace();
                         }
                         
                     }));
                 }
                 else
                 {
-                    
+                    queue.stop();
                 }
             }
         });

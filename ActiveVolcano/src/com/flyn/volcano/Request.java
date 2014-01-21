@@ -2,6 +2,7 @@ package com.flyn.volcano;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -14,7 +15,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
 {
     protected static final int  DEFAULT_RETRY_COUNT = 1;
 
-    private final Listener   mListener;
+    private final Listener      mListener;
     private final String        url;
     private final RequestParams requestPramas;
     private final int           method;
@@ -25,12 +26,12 @@ public abstract class Request<T> implements Comparable<Request<T>>
     private Object              tag;
     private RequestQueue        mRequestQueue;
 
-    public Request(int method, String url, RequestParams requestPramas, Listener  mListener)
+    public Request(int method, String url, RequestParams requestPramas, Listener mListener)
     {
         this(method, url, requestPramas, DEFAULT_RETRY_COUNT, mListener);
     }
 
-    public Request(int method, String url, RequestParams requestPramas, int retryCount, Listener  mListener)
+    public Request(int method, String url, RequestParams requestPramas, int retryCount, Listener mListener)
     {
         this.method = method;
         this.requestPramas = requestPramas;
@@ -125,7 +126,10 @@ public abstract class Request<T> implements Comparable<Request<T>>
 
     public final Map<String, String> getHeaders()
     {
-        return requestPramas.getUrlParams();
+        if (null != requestPramas)
+            return requestPramas.getUrlParams();
+        else
+            return new HashMap<String, String>();
     }
 
     public final void setSequence(int sequence)
@@ -186,8 +190,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
     {
         this.mRequestQueue = requestQueue;
     }
-    
-    
+
     public final Listener getListener()
     {
         return mListener;
