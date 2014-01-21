@@ -16,9 +16,9 @@ import android.util.Log;
 
 import com.flyn.volcano.SpendTimer.TimerListener;
 
-public class MultiPartWriter
+public class MultipartWriter
 {
-    private static final String          TAG                      = MultiPartWriter.class.getName();
+    private static final String          TAG                      = MultipartWriter.class.getName();
     private static final String          APPLICATION_OCTET_STREAM = "application/octet-stream";
     private static final byte[]          CR_LF                    = ("\r\n").getBytes();
     private static final byte[]          TRANSFER_ENCODING_BINARY = "Content-Transfer-Encoding: binary\r\n".getBytes();
@@ -39,7 +39,7 @@ public class MultiPartWriter
     private final Request<?>             request;
     private final HttpURLConnection      connection;
 
-    public MultiPartWriter(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery)
+    public MultipartWriter(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery)
     {
         final StringBuilder buf = new StringBuilder();
         final Random rand = new Random();

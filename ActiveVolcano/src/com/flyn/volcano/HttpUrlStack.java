@@ -230,7 +230,7 @@ public class HttpUrlStack implements HttpStack
         Map<String, FileWrapper> fileMap = requestParams.getFileParams();
         Map<String, StreamWrapper> streamMap = requestParams.getStreamParams();
 
-        MultiPartWriter writer = new MultiPartWriter(request, connection, responseDelivery);
+        MultipartWriter writer = new MultipartWriter(request, connection, responseDelivery);
         for (Entry<String, FileWrapper> entry : fileMap.entrySet())
         {
             writer.addPart(entry.getKey(), entry.getValue().file, entry.getValue().contentType);
