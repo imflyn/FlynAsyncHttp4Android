@@ -17,7 +17,7 @@ public class BasicNetwork implements Network
 
     private final HttpStack mHttpStack;
 
-    public BasicNetwork(HttpStack httpStack, ByteArrayPool pool)
+    public BasicNetwork(HttpStack httpStack)
     {
         this.mHttpStack = httpStack;
     }
