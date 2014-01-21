@@ -22,11 +22,10 @@ public class SpendTimer
     {
         if (timerListener == null)
             throw new IllegalStateException("TimerListener can' be null.");
-        
 
         if (bytesTotal <= 0)
             throw new IllegalStateException("BytesTotal must greater than zero.");
-        
+
         this.timerListener = timerListener;
         this.bytesTotal = bytesTotal;
     }
@@ -73,7 +72,6 @@ public class SpendTimer
         };
         this.timer.schedule(task, DEFAULT_START_TIMER_DELAY, DEFAULT_TIMER_DURATION);
     }
-    
 
     protected void stop()
     {

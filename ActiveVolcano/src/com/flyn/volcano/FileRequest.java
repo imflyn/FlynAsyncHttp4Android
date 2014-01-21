@@ -55,11 +55,10 @@ public class FileRequest extends Request<File>
         return this.mFile;
     }
 
-
     @Override
     protected Response<?> parseNetworkResponse(NetworkResponse response, final ResponseDelivery responseDelivery) throws IOException
     {
-        HttpEntity entity=response.getEntity();
+        HttpEntity entity = response.getEntity();
         long length = entity.getContentLength();
         this.bytesTotal = length > 0 ? length : entity.getContent().available();
         Log.i(TAG, "bytesTotal:" + bytesTotal);
@@ -79,10 +78,10 @@ public class FileRequest extends Request<File>
             } else
                 this.tempFile.delete();
         }
-        
-        SpendTimer timer=new SpendTimer((int)bytesTotal, new TimerListener()
+
+        SpendTimer timer = new SpendTimer((int) bytesTotal, new TimerListener()
         {
-            
+
             @Override
             public void onProgress(int bytesWritten, int bytesTotal, int speed)
             {
@@ -137,7 +136,7 @@ public class FileRequest extends Request<File>
             Utils.quickClose(accessFile);
             Utils.quickClose(inputStream);
         }
-        
+
         return Response.build(getTargetFile());
     }
 

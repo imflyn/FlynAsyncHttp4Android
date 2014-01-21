@@ -12,14 +12,14 @@ import com.flyn.volcano.SpendTimer.TimerListener;
 
 public abstract class Request<T> implements Comparable<Request<T>>
 {
-    protected static final int DEFAULT_RETRY_COUNT=1;
-    
+    protected static final int  DEFAULT_RETRY_COUNT = 1;
+
     private final String        url;
     private final RequestParams requestPramas;
     private final int           method;
     private final int           retryCount;
     private boolean             mResponseDelivered;
-    private boolean             mCanceled = false;
+    private boolean             mCanceled           = false;
     private Integer             sequence;
     private Object              tag;
     private RequestQueue        mRequestQueue;
@@ -36,7 +36,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
         this.url = url;
         this.retryCount = retryCount;
     }
-    
+
     protected abstract Response<?> parseNetworkResponse(NetworkResponse response, final ResponseDelivery responseDelivery) throws IOException;
 
     protected byte[] getData(NetworkResponse response, final ResponseDelivery responseDelivery) throws IOException
