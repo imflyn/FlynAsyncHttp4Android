@@ -61,14 +61,14 @@ public class RequestParams
         this.mFileParams.put(key, new FileWrapper(value, contentType));
     }
 
-    public void put(String key, InputStream value)
+    public void put(String key, String name,InputStream inputStream)
     {
-        put(key, value, null);
+        put(key, name, inputStream, null);
     }
 
-    public void put(String key, InputStream value, String contentType)
+    public void put(String key,String name, InputStream inputStream, String contentType)
     {
-        this.mStreamParams.put(key, new StreamWrapper(value, contentType));
+        this.mStreamParams.put(key, new StreamWrapper(inputStream, name, contentType));
     }
 
     public void remove(String key)
@@ -85,34 +85,28 @@ public class RequestParams
         return map;
     }
 
+    protected final Map<String, FileWrapper> getFileParams()
+    {
+        HashMap<String, FileWrapper> map = new HashMap<String, FileWrapper>();
+        map.putAll(this.mFileParams);
+        return map;
+    }
+
+    protected final Map<String, StreamWrapper> getStreamParams()
+    {
+        HashMap<String, StreamWrapper> map = new HashMap<String, StreamWrapper>();
+        map.putAll(this.mStreamParams);
+        return map;
+    }
+
     static class FileWrapper
     {
-        private File   File;
-        private String contentType;
+        protected File   file;
+        protected String contentType;
 
-        public FileWrapper(File file, String contentType)
+        protected FileWrapper(File file, String contentType)
         {
-            this.File = file;
-            this.contentType = contentType;
-        }
-
-        protected final File getFile()
-        {
-            return File;
-        }
-
-        protected final void setFile(File file)
-        {
-            File = file;
-        }
-
-        protected final String getContentType()
-        {
-            return contentType;
-        }
-
-        protected final void setContentType(String contentType)
-        {
+            this.file = file;
             this.contentType = contentType;
         }
 
@@ -120,32 +114,14 @@ public class RequestParams
 
     static class StreamWrapper
     {
-        private InputStream inStream;
-        private String      contentType;
+        protected String      name;
+        protected InputStream inputStream;
+        protected String      contentType;
 
-        public StreamWrapper(InputStream inStream, String contentType)
+        protected StreamWrapper(InputStream inputStream, String name, String contentType)
         {
-            this.inStream = inStream;
-            this.contentType = contentType;
-        }
-
-        protected final InputStream getInStream()
-        {
-            return inStream;
-        }
-
-        protected final void setInStream(InputStream inStream)
-        {
-            this.inStream = inStream;
-        }
-
-        protected final String getContentType()
-        {
-            return contentType;
-        }
-
-        protected final void setContentType(String contentType)
-        {
+            this.inputStream = inputStream;
+            this.name = name;
             this.contentType = contentType;
         }
 

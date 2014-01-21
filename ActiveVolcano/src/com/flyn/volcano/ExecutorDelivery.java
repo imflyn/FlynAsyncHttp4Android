@@ -1,13 +1,22 @@
 package com.flyn.volcano;
 
+import java.util.concurrent.Executor;
+
 import android.os.Handler;
 
 public class ExecutorDelivery implements ResponseDelivery
 {
-
-    public ExecutorDelivery(Handler handler)
+    private final Executor mResponsePoster;
+    public ExecutorDelivery(final Handler handler)
     {
-
+        mResponsePoster = new Executor()
+        {
+            @Override
+            public void execute(Runnable command)
+            {
+                handler.post(command);
+            }
+        };
     }
 
     @Override
@@ -50,5 +59,5 @@ public class ExecutorDelivery implements ResponseDelivery
     {
 
     }
-
+   
 }

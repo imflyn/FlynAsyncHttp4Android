@@ -2,9 +2,9 @@ package com.flyn.volcano;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URL;
@@ -36,11 +36,12 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 import com.flyn.volcano.Request.Method;
+import com.flyn.volcano.RequestParams.FileWrapper;
+import com.flyn.volcano.RequestParams.StreamWrapper;
 
 public class HttpUrlStack implements HttpStack
 {
 
-    private static final String    HEADER_CONTENT_TYPE        = "Content-Type";
     private static final int       DEFAULT_SOCKET_TIMEOUT     = 10 * 1000;
 
     private final Context          context;
@@ -197,7 +198,7 @@ public class HttpUrlStack implements HttpStack
         }
     }
 
-    private void setParams(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery) throws ProtocolException
+    private void setParams(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery) throws IOException
     {
         switch (request.getMethod())
         {
@@ -223,19 +224,31 @@ public class HttpUrlStack implements HttpStack
         }
     }
 
-    private void uploadIfNeeded(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery)
+    private void uploadIfNeeded(Request<?> request, HttpURLConnection connection, ResponseDelivery responseDelivery) throws IOException
     {
-        // byte[] body = request.getBody();
-        // if (body != null)
-        // {
-        // connection.setDoOutput(true);
-        // connection.addRequestProperty(HEADER_CONTENT_TYPE,
-        // request.getBodyContentType());
-        // DataOutputStream out = new
-        // DataOutputStream(connection.getOutputStream());
-        // out.write(body);
-        // out.close();
-        // }
+        RequestParams requestParams = request.getRequestPramas();
+        Map<String, FileWrapper> fileMap = requestParams.getFileParams();
+        Map<String, StreamWrapper> streamMap = requestParams.getStreamParams();
+
+        MultiPartWriter writer = new MultiPartWriter(request, connection, responseDelivery);
+        for (Entry<String, FileWrapper> entry : fileMap.entrySet())
+        {
+            writer.addPart(entry.getKey(), entry.getValue().file, entry.getValue().contentType);
+        }
+        for (Entry<String, StreamWrapper> entry : streamMap.entrySet())
+        {
+            writer.addPart(entry.getKey(), entry.getValue().name, entry.getValue().inputStream, entry.getValue().contentType);
+        }
+        connection.setDoOutput(true);
+        OutputStream outStream = connection.getOutputStream();
+        try
+        {
+            writer.writeTo(outStream);
+        } finally
+        {
+            Utils.quickClose(outStream);
+        }
+
     }
 
     private HttpEntity entityFromConnection(HttpURLConnection connection)
