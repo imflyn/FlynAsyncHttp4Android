@@ -54,19 +54,17 @@ public abstract class Request<T> implements Comparable<Request<T>>
         {
             if (isCanceled())
                 return null;
-            
-            BufferedInputStream bufferedInputStream=null;
-            
-            if(Utils.parseContentEnconding(response.getHeaders()).equals("gzip"))
+
+            BufferedInputStream bufferedInputStream = null;
+
+            if (Utils.parseContentEnconding(response.getHeaders()).equals("gzip"))
             {
-                bufferedInputStream=  new BufferedInputStream(new GZIPInputStream(inStream));
-            }
-            else
+                bufferedInputStream = new BufferedInputStream(new GZIPInputStream(inStream));
+            } else
             {
-                bufferedInputStream=  new BufferedInputStream(inStream);
+                bufferedInputStream = new BufferedInputStream(inStream);
             }
-          
-            
+
             long contentLength = entity.getContentLength();
             if (contentLength > Integer.MAX_VALUE)
             {

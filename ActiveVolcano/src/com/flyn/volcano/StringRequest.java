@@ -32,7 +32,7 @@ public class StringRequest extends Request<String>
         byte[] data = getData(response, responseDelivery);
 
         String result;
-        String charset=Utils.parseCharset(response.getHeaders());
+        String charset = Utils.parseCharset(response.getHeaders());
         try
         {
             result = new String(data, charset);

@@ -37,7 +37,7 @@ public class MultipartWriter
     private final ResponseDelivery       responseDelivery;
     private final Request<?>             request;
 
-    public MultipartWriter(Request<?> request,ResponseDelivery responseDelivery)
+    public MultipartWriter(Request<?> request, ResponseDelivery responseDelivery)
     {
         final StringBuilder buf = new StringBuilder();
         final Random rand = new Random();
@@ -49,13 +49,12 @@ public class MultipartWriter
         this.boundary = buf.toString();
         this.boundaryLine = ("--" + this.boundary + "\r\n").getBytes();
         this.boundaryEnd = ("--" + this.boundary + "--\r\n").getBytes();
-        
+
         this.responseDelivery = responseDelivery;
         this.request = request;
 
         this.mPool = new ByteArrayPool(DEFAULT_BUFFER_SIZE);
         this.out = new PoolingByteArrayOutputStream(this.mPool);
-        
 
     }
 
@@ -153,10 +152,10 @@ public class MultipartWriter
         contentLen += this.boundaryEnd.length;
         return contentLen;
     }
-    
+
     protected boolean isEmpty()
     {
-        return this.fileParts==null||this.fileParts.size()==0;
+        return this.fileParts == null || this.fileParts.size() == 0;
     }
 
     protected final String getBoundary()
@@ -271,7 +270,5 @@ public class MultipartWriter
             Utils.quickClose(inputStream);
         }
     }
-    
- 
-    
+
 }

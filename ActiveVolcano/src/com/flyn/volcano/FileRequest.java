@@ -122,7 +122,7 @@ public class FileRequest extends Request<File>
             int count;
             byte[] buffer = new byte[4096];
 
-            while (!isCanceled() && (count = inputStream.read(buffer)) != -1&& !Thread.currentThread().isInterrupted())
+            while (!isCanceled() && (count = inputStream.read(buffer)) != -1 && !Thread.currentThread().isInterrupted())
             {
                 accessFile.write(buffer, 0, count);
                 timer.updateProgress(count);

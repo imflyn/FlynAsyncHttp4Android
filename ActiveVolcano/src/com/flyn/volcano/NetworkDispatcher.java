@@ -47,7 +47,7 @@ public class NetworkDispatcher extends Thread
             {
                 if (this.mQuit)
                     return;
-                
+
                 try
                 {
                     NetworkResponse networkResponse = this.mNetwork.executeRequest(request, this.mDelivery);
