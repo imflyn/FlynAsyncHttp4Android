@@ -17,7 +17,7 @@ public abstract class Request<T> implements Comparable<Request<T>>
 {
     protected static final int  DEFAULT_RETRY_COUNT = 1;
 
-    private final Listener      mListener;
+    private Listener            mListener;
     private final String        url;
     private final RequestParams requestPramas;
     private final int           method;
@@ -27,6 +27,16 @@ public abstract class Request<T> implements Comparable<Request<T>>
     private Integer             sequence;
     private Object              tag;
     private RequestQueue        mRequestQueue;
+
+    public Request(String url, RequestParams requestPramas)
+    {
+        this(Method.GET, url, requestPramas, null);
+    }
+
+    public Request(int method, String url, RequestParams requestPramas)
+    {
+        this(method, url, requestPramas, null);
+    }
 
     public Request(int method, String url, RequestParams requestPramas, Listener mListener)
     {
@@ -206,6 +216,11 @@ public abstract class Request<T> implements Comparable<Request<T>>
     public final Listener getListener()
     {
         return mListener;
+    }
+
+    public final void setListener(Listener listener)
+    {
+        this.mListener = listener;
     }
 
     protected void finish()
