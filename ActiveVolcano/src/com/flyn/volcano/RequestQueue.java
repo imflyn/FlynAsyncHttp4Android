@@ -96,7 +96,7 @@ public class RequestQueue
         return request;
     }
 
-    public int getSequenceNumber()
+    private int getSequenceNumber()
     {
         return this.mSequenceGenerator.incrementAndGet();
     }
