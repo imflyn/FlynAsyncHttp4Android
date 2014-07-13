@@ -5,7 +5,16 @@ import java.io.UnsupportedEncodingException;
 
 public class StringRequest extends Request<String>
 {
+    public StringRequest(String url, RequestParams requestPramas)
+    {
+        super(Method.GET, url, requestPramas, null);
+    }
 
+    public StringRequest(int method, String url, RequestParams requestPramas)
+    {
+        super(method, url, requestPramas, null);
+    }
+    
     public StringRequest(int method, String url, RequestParams requestPramas, Listener mListener)
     {
         super(method, url, requestPramas, mListener);
