@@ -11,7 +11,7 @@ public class RequestFuture<T> implements Future<T>
     private Request<?>     mRequest;
     private boolean        mResultReceived = false;
     private T              mResult;
-    private Throwable      mException;
+    public Throwable       mException;
 
     public static <E> RequestFuture<E> newFuture()
     {
