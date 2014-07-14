@@ -173,7 +173,7 @@ public class HttpClientStack extends NetStack
         {
             case Method.GET:
                 uriRequest = new HttpGet(Utils.getUrlWithParams(this.isURLEncodingEnabled, url, params));
-                break;  
+                break;
             case Method.POST:
                 uriRequest = new HttpPost(url);
                 if (null != params)

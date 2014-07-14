@@ -90,11 +90,11 @@ public abstract class FileResponseHandler extends HttpResponseHandler
         {
             long length = entity.getContentLength();
             this.bytesTotal = length > 0 ? length : entity.getContent().available();
-            Log.i(TAG, "bytesTotal:"+bytesTotal);
+            Log.i(TAG, "bytesTotal:" + bytesTotal);
 
-            if(this.isCancelled)
+            if (this.isCancelled)
                 return null;
-            
+
             if (this.mFile.exists())
                 throw new IOException("File already exists.");
 
@@ -103,9 +103,8 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                 if (this.isContinue)
                 {
                     this.bytesWritten = this.tempFile.length();
-                    this.bytesTotal+=this.bytesWritten;
-                }
-                else
+                    this.bytesTotal += this.bytesWritten;
+                } else
                     this.tempFile.delete();
             }
 
@@ -135,14 +134,14 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                 int count;
                 byte[] buffer = new byte[4096];
 
-                while (!isCancelled&&(count = inputStream.read(buffer)) != -1)
+                while (!isCancelled && (count = inputStream.read(buffer)) != -1)
                 {
                     accessFile.write(buffer, 0, count);
                     updateProgress(count);
                 }
-                if(this.isCancelled)
+                if (this.isCancelled)
                     return null;
-                
+
                 this.tempFile.renameTo(this.mFile);
 
             } catch (Exception e)
@@ -196,8 +195,7 @@ public abstract class FileResponseHandler extends HttpResponseHandler
                         sendProgressMessage((int) bytesWritten, (int) bytesTotal, currentSpeed);
                     else
                         first = false;
-                    
-                    
+
                 } else
                 {
                     stopTimer();

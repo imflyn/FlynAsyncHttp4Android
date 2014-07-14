@@ -14,7 +14,7 @@ public class StringRequest extends Request<String>
     {
         super(method, url, requestPramas, null);
     }
-    
+
     public StringRequest(int method, String url, RequestParams requestPramas, Listener mListener)
     {
         super(method, url, requestPramas, mListener);

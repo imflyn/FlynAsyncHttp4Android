@@ -19,7 +19,7 @@ public abstract class BitmapResponseHandler extends HttpResponseHandler
     private final int             mMaxHeight;
     private final Config          mDecodeConfig;
     private SoftReference<Bitmap> bitmap;
-  
+
     /**
      * Decoding lock so that we don't decode more than one image at a time (to
      * avoid OOM's)
@@ -53,8 +53,8 @@ public abstract class BitmapResponseHandler extends HttpResponseHandler
     @Override
     public void sendResponseMessage(HttpResponse response) throws IOException
     {
-        if(this.isCancelled)
-            return ;
+        if (this.isCancelled)
+            return;
         HttpEntity entity = response.getEntity();
 
         int statusCode = response.getStatusLine().getStatusCode();
@@ -66,11 +66,11 @@ public abstract class BitmapResponseHandler extends HttpResponseHandler
             {
                 try
                 {
-                    
+
                     responseData = super.entityToData(entity);
-                    if(this.isCancelled)
-                        return ;
-                    
+                    if (this.isCancelled)
+                        return;
+
                     BitmapFactory.Options mOptions = new BitmapFactory.Options();
                     if (this.mMaxHeight == 0 && this.mMaxWidth == 0)
                     {

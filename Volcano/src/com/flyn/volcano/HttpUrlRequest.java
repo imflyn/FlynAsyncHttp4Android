@@ -136,7 +136,7 @@ public class HttpUrlRequest extends Request
         this.isCancelled = true;
         if (this.httpEntity != null && this.httpEntity instanceof MultipartEntity)
             ((MultipartEntity) this.httpEntity).stop();
-        
+
         this.responseHandler.cancel();
         return isCancelled();
     }

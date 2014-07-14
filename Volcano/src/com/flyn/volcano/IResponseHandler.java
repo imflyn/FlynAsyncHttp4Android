@@ -35,7 +35,7 @@ public interface IResponseHandler
     void setUseSynchronousMode(boolean useSynchronousMode);
 
     boolean getUseSynchronousMode();
-    
+
     void cancel();
 
 }

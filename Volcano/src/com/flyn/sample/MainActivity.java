@@ -77,12 +77,14 @@ public class MainActivity extends Activity
                 // System.out.println("speed:" + speed);
                 // }
                 // });
-//                RequestParams params = new RequestParams();
-//                params.putByteRange((int) new File(Environment.getExternalStorageDirectory() + "/yyj", "好歌.tmp").length(), 4427185);
-                    
-                Map<String,String> map=new HashMap<String, String>();
-                map.put("Range", "bytes="+(int) new File(Environment.getExternalStorageDirectory() + "/yyj", "好歌.tmp").length()+"-");
-                 
+                // RequestParams params = new RequestParams();
+                // params.putByteRange((int) new
+                // File(Environment.getExternalStorageDirectory() + "/yyj",
+                // "好歌.tmp").length(), 4427185);
+
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("Range", "bytes=" + (int) new File(Environment.getExternalStorageDirectory() + "/yyj", "好歌.tmp").length() + "-");
+
                 if (null == stack)
                 {
                     String url = "http://zhangmenshiting.baidu.com/data2/music/109017153/8930817375600128.mp3?xcode=2a9536886231123c387700702f9919cd17c9e7c86eb6cec7";
@@ -154,7 +156,7 @@ public class MainActivity extends Activity
                     //
                     // @Override
                     // public void onFailure(int statusCode, Map<String, String>
-                     // headers, byte[] responseBody, Throwable error)
+                    // headers, byte[] responseBody, Throwable error)
                     // {
                     // System.out.println(error.toString());
                     // }

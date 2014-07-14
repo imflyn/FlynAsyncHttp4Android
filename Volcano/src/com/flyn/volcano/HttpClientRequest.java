@@ -96,7 +96,7 @@ public class HttpClientRequest extends Request
         {
             this.request.abort();
         }
-        this.responseHandler.cancel(); 
+        this.responseHandler.cancel();
         return isCancelled();
     }
 
