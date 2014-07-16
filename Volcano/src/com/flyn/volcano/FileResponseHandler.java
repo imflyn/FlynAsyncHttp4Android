@@ -13,6 +13,7 @@ import java.util.TimerTask;
 
 import org.apache.http.HttpEntity;
 
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -181,7 +182,7 @@ public abstract class FileResponseHandler extends HttpResponseHandler
             {
                 if (isScheduleing && !Thread.currentThread().isInterrupted())
                 {
-                    long nowTime = System.currentTimeMillis();
+                    long nowTime = SystemClock.uptimeMillis();
 
                     long spendTime = nowTime - timeStamp;
                     timeStamp = nowTime;

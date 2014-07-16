@@ -21,6 +21,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicHeader;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 /**
@@ -36,7 +37,8 @@ class MultipartEntity implements HttpEntity
     private static final String          APPLICATION_OCTET_STREAM = "application/octet-stream";
     private static final byte[]          CR_LF                    = ("\r\n").getBytes();
     private static final byte[]          TRANSFER_ENCODING_BINARY = "Content-Transfer-Encoding: binary\r\n".getBytes();
-    private static final char[]          MULTIPART_CHARS          = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+    private static final char[]          MULTIPART_CHARS          = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                                          .toCharArray();
     private static final int             DEFAULT_BUFFER_SIZE      = 8192;
 
     private String                       boundary;
@@ -57,7 +59,7 @@ class MultipartEntity implements HttpEntity
     private Timer                        timer;
 
     private boolean                      isScheduleing            = true;
-    private long                         timeStamp                = System.currentTimeMillis();
+    private long                         timeStamp                = SystemClock.uptimeMillis();
     private int                          currentSpeed             = 0;
     private int                          sizeStamp                = 0;
 
@@ -184,7 +186,7 @@ class MultipartEntity implements HttpEntity
             {
                 if (isScheduleing)
                 {
-                    long nowTime = System.currentTimeMillis();
+                    long nowTime = SystemClock.uptimeMillis();
                     long spendTime = nowTime - timeStamp;
                     timeStamp = nowTime;
 

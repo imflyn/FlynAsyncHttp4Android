@@ -3,6 +3,8 @@ package com.flyn.volcano;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.os.SystemClock;
+
 public class SpendTimer
 {
     private final static int    DEFAULT_TIMER_DURATION    = 1500;
@@ -51,7 +53,7 @@ public class SpendTimer
             {
                 if (isScheduleing && !Thread.currentThread().isInterrupted())
                 {
-                    long nowTime = System.currentTimeMillis();
+                    long nowTime = SystemClock.uptimeMillis();
 
                     long spendTime = nowTime - timeStamp;
                     timeStamp = nowTime;
