@@ -5,12 +5,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import android.util.Log;
+
 public class RequestFuture<T> implements Future<T>
 {
     private final Listener mListner;
     private Request<?>     mRequest;
     private boolean        mResultReceived = false;
-    private T              mResult;
+    private T              mResult         = null;
     public Throwable       mException;
 
     public static <E> RequestFuture<E> newFuture()
@@ -27,16 +29,18 @@ public class RequestFuture<T> implements Future<T>
             @Override
             public void onSuccess(Response<?> response)
             {
+                Log.i(RequestFuture.class.getSimpleName(), "onSuccess");
                 mResultReceived = true;
                 mResult = (T) response.getResult();
-                notifyAll();
+                RequestFuture.this.notifyAll();
             }
 
             @Override
             public void onFailure(Throwable error)
             {
+                Log.i(RequestFuture.class.getSimpleName(), "onFailure");
                 mException = error;
-                notifyAll();
+                RequestFuture.this.notifyAll();
             }
         };
     }
@@ -85,6 +89,8 @@ public class RequestFuture<T> implements Future<T>
 
     private synchronized T doGet(Long timeoutMs) throws InterruptedException, ExecutionException, TimeoutException
     {
+        Log.i(RequestFuture.class.getSimpleName(), "doGet");
+
         if (mException != null)
         {
             throw new ExecutionException(mException);

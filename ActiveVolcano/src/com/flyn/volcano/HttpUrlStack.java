@@ -41,7 +41,7 @@ import com.flyn.volcano.RequestParams.StreamWrapper;
 public class HttpUrlStack implements HttpStack
 {
 
-    private static final int       DEFAULT_SOCKET_TIMEOUT     = 10 * 1000;
+    private static final int       DEFAULT_SOCKET_TIMEOUT     = 25 * 1000;
     private static final String    DEFAULT_CHARSET            = "utf-8";
 
     private final Context          context;
