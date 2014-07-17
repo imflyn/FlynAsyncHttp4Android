@@ -17,9 +17,10 @@ public class Response<T>
         this.result = result;
     }
 
-    public final T getResult()
+    @SuppressWarnings({ "unchecked", "hiding" })
+    public <T> T getResult()
     {
-        return result;
+        return (T) result;
     }
 
 }

@@ -25,18 +25,16 @@ public class RequestFuture<T> implements Future<T>
         mListner = new Listener()
         {
 
-            @SuppressWarnings("unchecked")
             @Override
             public void onSuccess(Response<?> response)
             {
                 Log.i(RequestFuture.class.getSimpleName(), "onSuccess");
                 mResultReceived = true;
-                mResult = (T) response.getResult();
-                synchronized (mRequest)
+                mResult = response.getResult();
+                synchronized (RequestFuture.this)
                 {
                     RequestFuture.this.notifyAll();
                 }
-
             }
 
             @Override
@@ -44,10 +42,11 @@ public class RequestFuture<T> implements Future<T>
             {
                 Log.i(RequestFuture.class.getSimpleName(), "onFailure");
                 mException = error;
-                synchronized (mRequest)
+                synchronized (RequestFuture.this)
                 {
                     RequestFuture.this.notifyAll();
                 }
+
             }
         };
     }
@@ -94,40 +93,36 @@ public class RequestFuture<T> implements Future<T>
         return doGet(TimeUnit.MILLISECONDS.convert(timeout, unit));
     }
 
-    private T doGet(Long timeoutMs) throws InterruptedException, ExecutionException, TimeoutException
+    private synchronized T doGet(Long timeoutMs) throws InterruptedException, ExecutionException, TimeoutException
     {
-        synchronized (mRequest)
+        Log.i(RequestFuture.class.getSimpleName(), "doGet");
+
+        if (mException != null)
         {
+            throw new ExecutionException(mException);
+        }
 
-            Log.i(RequestFuture.class.getSimpleName(), "doGet");
+        if (mResultReceived)
+        {
+            return mResult;
+        }
 
-            if (mException != null)
-            {
-                throw new ExecutionException(mException);
-            }
+        if (timeoutMs == null)
+        {
+            wait(0);
+        } else if (timeoutMs > 0)
+        {
+            wait(timeoutMs);
+        }
 
-            if (mResultReceived)
-            {
-                return mResult;
-            }
+        if (mException != null)
+        {
+            throw new ExecutionException(mException);
+        }
 
-            if (timeoutMs == null)
-            {
-                mResult.wait(0);
-            } else if (timeoutMs > 0)
-            {
-                mResult.wait(timeoutMs);
-            }
-
-            if (mException != null)
-            {
-                throw new ExecutionException(mException);
-            }
-
-            if (!mResultReceived)
-            {
-                throw new TimeoutException();
-            }
+        if (!mResultReceived)
+        {
+            throw new TimeoutException();
         }
         return mResult;
     }
