@@ -8,7 +8,6 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,11 +79,8 @@ public class HttpUrlStack implements HttpStack
     {
         String url = request.getUrl();
 
-        HashMap<String, String> headerMap = new HashMap<String, String>();
-        headerMap.putAll(request.getHeaders());
-
         HttpURLConnection connection = openConnection(url, request);
-        addHeaders(headerMap, connection);
+        addHeaders(request.getHeaders(), connection);
         setParams(request, connection, responseDelivery);
 
         ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 1);

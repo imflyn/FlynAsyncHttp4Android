@@ -2,9 +2,13 @@ package com.flyn.volcano;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.text.TextUtils;
 
@@ -14,6 +18,7 @@ public class RequestParams
     private ConcurrentHashMap<String, String>        mUrlParams;
     private ConcurrentHashMap<String, FileWrapper>   mFileParams;
     private ConcurrentHashMap<String, StreamWrapper> mStreamParams;
+    private CopyOnWriteArrayList<Header>             mHeaderParams;
 
     public RequestParams()
     {
@@ -24,7 +29,8 @@ public class RequestParams
     {
         this(new HashMap<String, String>()
         {
-            private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1333044953920909830L;
+
             {
                 put(key, value);
             }
@@ -43,6 +49,7 @@ public class RequestParams
         this.mUrlParams = new ConcurrentHashMap<String, String>();
         this.mStreamParams = new ConcurrentHashMap<String, RequestParams.StreamWrapper>();
         this.mFileParams = new ConcurrentHashMap<String, RequestParams.FileWrapper>();
+        this.mHeaderParams = new CopyOnWriteArrayList<RequestParams.Header>();
     }
 
     public void put(String key, String value)
@@ -71,6 +78,20 @@ public class RequestParams
         this.mStreamParams.put(key, new StreamWrapper(inputStream, name, contentType));
     }
 
+    public void putHeader(String key, String value)
+    {
+        if (!TextUtils.isEmpty(key) && null != value)
+            this.mHeaderParams.add(new Header(key, value));
+    }
+
+    public void put(Header header)
+    {
+        if (null == header)
+            throw new IllegalArgumentException("Header can not be null.");
+
+        this.mHeaderParams.add(header);
+    }
+
     public void remove(String key)
     {
         this.mUrlParams.remove(key);
@@ -82,21 +103,28 @@ public class RequestParams
     {
         HashMap<String, String> map = new HashMap<String, String>();
         map.putAll(this.mUrlParams);
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     protected final Map<String, FileWrapper> getFileParams()
     {
         HashMap<String, FileWrapper> map = new HashMap<String, FileWrapper>();
         map.putAll(this.mFileParams);
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     protected final Map<String, StreamWrapper> getStreamParams()
     {
         HashMap<String, StreamWrapper> map = new HashMap<String, StreamWrapper>();
         map.putAll(this.mStreamParams);
-        return map;
+        return Collections.unmodifiableMap(map);
+    }
+
+    protected final List<Header> getHeaders()
+    {
+        ArrayList<Header> headers = new ArrayList<RequestParams.Header>();
+        headers.addAll(this.mHeaderParams);
+        return Collections.unmodifiableList(headers);
     }
 
     static class FileWrapper
@@ -125,5 +153,17 @@ public class RequestParams
             this.contentType = contentType;
         }
 
+    }
+
+    static class Header
+    {
+        protected String name;
+        protected String value;
+
+        protected Header(String name, String value)
+        {
+            this.name = name;
+            this.value = value;
+        }
     }
 }

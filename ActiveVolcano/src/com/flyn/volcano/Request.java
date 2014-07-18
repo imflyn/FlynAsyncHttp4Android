@@ -3,7 +3,9 @@ package com.flyn.volcano;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -11,6 +13,7 @@ import org.apache.http.HttpEntity;
 
 import android.util.Log;
 
+import com.flyn.volcano.RequestParams.Header;
 import com.flyn.volcano.SpendTimer.TimerListener;
 
 public abstract class Request<T> implements Comparable<Request<T>>
@@ -149,9 +152,18 @@ public abstract class Request<T> implements Comparable<Request<T>>
     public final Map<String, String> getHeaders()
     {
         if (null != requestPramas)
-            return requestPramas.getUrlParams();
-        else
-            return new HashMap<String, String>();
+        {
+            HashMap<String, String> headersMap = new HashMap<String, String>();
+            List<Header> headers = requestPramas.getHeaders();
+            Header header;
+            for (int i = 0; i < headers.size(); i++)
+            {
+                header = headers.get(i);
+                headersMap.put(header.name, header.value);
+            }
+            return Collections.unmodifiableMap(headersMap);
+        } else
+            return Collections.unmodifiableMap(new HashMap<String, String>());
     }
 
     public final void setSequence(int sequence)

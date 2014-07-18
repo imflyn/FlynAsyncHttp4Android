@@ -10,6 +10,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.http.impl.cookie.DateParseException;
 import org.apache.http.impl.cookie.DateUtils;
@@ -105,14 +106,15 @@ public class Utils
         url = url.replace(" ", "%20");
         if (null != params)
         {
-            // String paramString = params.getUrlParams();
-            String paramString = "";
-            if (!url.contains("?"))
+            for (Entry<String, String> entry : params.getUrlParams().entrySet())
             {
-                url += "?" + paramString;
-            } else
-            {
-                url += "&" + paramString;
+                if (!url.contains("?"))
+                {
+                    url += "?" + entry.getKey() + "=" + entry.getValue();
+                } else
+                {
+                    url += "&" + entry.getKey() + "=" + entry.getValue();
+                }
             }
         }
         return url;
