@@ -125,7 +125,7 @@ public class Utils
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         String extraInfo = networkInfo.getExtraInfo();
-        if (extraInfo != null && extraInfo.contains("CMWAP"))
+        if (extraInfo != null && extraInfo.toUpperCase(Locale.ENGLISH).contains("CMWAP"))
             return true;
         return false;
     }
