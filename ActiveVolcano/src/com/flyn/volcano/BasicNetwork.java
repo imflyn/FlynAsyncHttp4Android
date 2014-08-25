@@ -21,7 +21,7 @@ public class BasicNetwork implements Network
     {
         this.mHttpStack = httpStack;
     }
-
+  
     @Override
     public NetworkResponse executeRequest(final Request<?> request, final ResponseDelivery responseDelivery) throws IOException
     {
