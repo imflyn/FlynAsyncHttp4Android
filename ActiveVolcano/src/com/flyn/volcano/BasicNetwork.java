@@ -20,7 +20,7 @@ public class BasicNetwork implements Network
     public BasicNetwork(HttpStack httpStack)
     {
         this.mHttpStack = httpStack;
-    }
+    } 
   
     @Override
     public NetworkResponse executeRequest(final Request<?> request, final ResponseDelivery responseDelivery) throws IOException
