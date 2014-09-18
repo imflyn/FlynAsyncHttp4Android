@@ -128,10 +128,13 @@ public class HttpUrlStack implements HttpStack
     private HttpURLConnection openConnection(String parsedUrl, Request<?> request) throws IOException
     {
         HttpURLConnection connection = null;
-        parsedUrl = Utils.getUrlWithParams(parsedUrl, request.getRequestPramas());
+        if (request.getMethod() != Method.POST || request.getMethod() != Method.PUT)
+        {
+            parsedUrl = Utils.getUrlWithParams(parsedUrl, request.getRequestPramas());
+        }
         URL url = new URL(parsedUrl);
 
-        // 对移动wap网络的特殊处理
+        // 对移动wap网络的特殊处理 tips:经过测试似乎没有必要
         if (Utils.CMMAP_Request(this.context))
         {
             String myURLStr = "http://10.0.0.172".concat(url.getPath());
@@ -230,6 +233,7 @@ public class HttpUrlStack implements HttpStack
         RequestParams requestParams = request.getRequestPramas();
         Map<String, FileWrapper> fileMap = requestParams.getFileParams();
         Map<String, StreamWrapper> streamMap = requestParams.getStreamParams();
+        Map<String, String> urlParamsMap = requestParams.getUrlParams();
 
         MultipartWriter writer = new MultipartWriter(request, responseDelivery);
         for (Entry<String, FileWrapper> entry : fileMap.entrySet())
@@ -239,6 +243,10 @@ public class HttpUrlStack implements HttpStack
         for (Entry<String, StreamWrapper> entry : streamMap.entrySet())
         {
             writer.addPart(entry.getKey(), entry.getValue().name, entry.getValue().inputStream, entry.getValue().contentType);
+        }
+        for (Entry<String, String> entry : urlParamsMap.entrySet())
+        {
+            writer.addPart(entry.getKey(), entry.getValue(), "text/plain");
         }
 
         if (!writer.isEmpty())
